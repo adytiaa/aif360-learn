@@ -41,7 +41,7 @@ concepts and capabilities. The `tutorials and other notebooks
 deeper, data scientist-oriented introduction. The complete API is also
 available.
 
-Being a comprehensive set of capabilities, it may be confusing to figure out
+Being comprised of a comprehensive set of capabilities, it may be confusing to figure out
 which metrics and algorithms are most appropriate for a given use case. To
 help, we have created some `guidance material
 <http://aif360.mybluemix.net/resources#guidance>`_ that can be consulted.
