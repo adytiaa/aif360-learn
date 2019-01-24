@@ -53,10 +53,10 @@ make_conda() {
 }
 
 if [[ "$DISTRIB" == "conda" ]]; then
-    TO_INSTALL="python=$PYTHON_VERSION pip pytest pytest-cov"
+    TO_INSTALL="python=$PYTHON_VERSION pip pytest pytest-cov numpy scipy"
     make_conda $TO_INSTALL
-    pip install numpy
-    pip install -r requirements.txt
+    #pip install numpy
+    #pip install -r requirements.txt
 fi
 
 pip install coverage codecov
@@ -75,7 +75,8 @@ try:
 except ImportError:
     pass
 "
-python setup.py develop
+# python setup.py develop
+pip install -e.[docs,docs]
 if [ $TRAVIS_OS_NAME = "linux" ]
 then
 	ccache --show-stats
