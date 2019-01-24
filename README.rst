@@ -92,7 +92,7 @@ Requirements:
 - Python 3.5+
 
 Installation is easiest on a Unix-like system running Python 3. See the
-[Troubleshooting](#troubleshooting) section if you have issues with other
+`Troubleshooting`_ section if you have issues with other
 configurations.
 
 (Optional) Create a virtual environment
@@ -107,7 +107,7 @@ Conda
 """""
 
 Conda is recommended for all configurations though Virtualenv is generally
-interchangeable for our purposes ([CVXPY](#cvxpy) may require conda in some
+interchangeable for our purposes `CVXPY`_ may require conda in some
 cases). Miniconda is sufficient (see `the difference between Anaconda and
 Miniconda
 <https://conda.io/docs/user-guide/install/download.html#anaconda-or-miniconda>`_
@@ -128,7 +128,7 @@ run::
     (aiflearn)$ conda deactivate
 
 
-The prompt will return to `$ `.
+The prompt will return to `$`.
 
 Note: Older versions of conda may use `source activate aiflearn` and `source
 deactivate` (`activate aiflearn` and `deactivate` on Windows).
@@ -157,7 +157,7 @@ Clone the latest version of this repository::
 
 If you'd like to run the examples, download the datasets now and place them in
 their respective folders as described in
-[aiflearn/data/README.md](aiflearn/data/README.md).
+`aiflearn/data/README.md <aiflearn/data/README.md>`_.
 
 Then, navigate to the root directory of the project and run::
 
@@ -174,11 +174,11 @@ To run the example notebooks, install the additional requirements as follows::
     pip install -r requirements.txt
 
 
-Then, follow the [Getting Started](https://pytorch.org) instructions from
+Then, follow the `Getting Started <https://pytorch.org>`_ instructions from
 PyTorch to download and install the latest version for your machine.
 
 Finally, if you did not already, download the datasets as described in
-[aiflearn/data/README.md](aiflearn/data/README.md) but place them **in the
+`aiflearn/data/README.md <aiflearn/data/README.md>`_ but place them **in the
 appropriate sub-folder** in
 `$ANACONDA_PATH/envs/aiflearn/lib/python3.5/site-packages/aif360/data/raw`
 where `$ANACONDA_PATH` is the base path to your conda installation (e.g.
@@ -215,16 +215,16 @@ TensorFlow is only required for use with the
 CVXPY
 """""
 
-On Windows, you may need to download the appropriate [Visual Studio C++
-compiler for Python](https://wiki.python.org/moin/WindowsCompilers). Then,
+On Windows, you may need to download the appropriate `Visual Studio C++
+compiler for Python <https://wiki.python.org/moin/WindowsCompilers>`_. Then,
 re-run::
 
 
     pip install -r requirements.txt
 
 
-See the [CVXPY Installation
-Instructions](https://www.cvxpy.org/install/index.html#windows)
+See the `CVXPY Installation
+Instructions <https://www.cvxpy.org/install/index.html#windows>`_
 for an alternate installation procedure using conda.
 
 CVXPY is only required for use with the
@@ -238,13 +238,13 @@ The `examples` directory contains a diverse collection of jupyter notebooks
 that use this package in various ways. Both tutorials and demos illustrate
 working code using `aiflearn`. Tutorials provide additional discussion that
 walks the user through the various steps of the notebook. See the details about
-[tutorials and demos here](examples/README.md)
+`tutorials and demos here <examples/README.md>`_.
 
 Citing AIF360
 -------------
 
 A technical description of AI Fairness 360 is available in this
-[paper](https://arxiv.org/abs/1810.01943). Below is the bibtex entry for this
+`paper <https://arxiv.org/abs/1810.01943>`_. Below is the bibtex entry for this
 paper.::
 
 
