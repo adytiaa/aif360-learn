@@ -1,7 +1,4 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
+import numpy as np
 
 from aiflearn.datasets import StructuredDataset
 
@@ -33,15 +30,20 @@ class BinaryLabelDataset(StructuredDataset):
         """
         super(BinaryLabelDataset, self).validate_dataset()
 
-        # =========================== SHAPE CHECKING ===========================
+        # =========================== SHAPE CHECKING ==========================
         # Verify if the labels are only 1 column
         if self.labels.shape[1] != 1:
             raise ValueError("BinaryLabelDataset only supports single-column "
                 "labels:\n\tlabels.shape = {}".format(self.labels.shape))
 
-        # =========================== VALUE CHECKING ===========================
-        # Check if the favorable and unfavorable labels match those in the dataset
-        if (set([self.favorable_label, self.unfavorable_label])
-                != set(self.labels.ravel())):
-            raise ValueError("The favorable and unfavorable labels provided do "
-                             "not match the labels in the dataset.")
+        # =========================== VALUE CHECKING ==========================
+        # Check if the favorable and unfavorable labels match those in the
+        # dataset
+        if (not set(self.labels.ravel()) <=
+                set([self.favorable_label, self.unfavorable_label])):
+            raise ValueError("The favorable and unfavorable labels provided "
+                             "do not match the labels in the dataset.")
+
+        if np.all(self.scores == self.labels):
+            self.scores = ((self.scores == self.favorable_label)
+                           .astype(np.float64))

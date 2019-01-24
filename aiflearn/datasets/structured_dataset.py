@@ -59,7 +59,7 @@ class StructuredDataset(Dataset):
     """
 
     def __init__(self, df, label_names, protected_attribute_names,
-                 instance_weights_name=None,
+                 instance_weights_name=None, scores_names=[],
                  unprivileged_protected_attributes=[],
                  privileged_protected_attributes=[], metadata=None):
         """
@@ -104,13 +104,17 @@ class StructuredDataset(Dataset):
         protected_attribute_names = list(map(str, protected_attribute_names))
 
         self.feature_names = [n for n in df.columns if n not in label_names
+                              and (not scores_names or n not in scores_names)
                               and n != instance_weights_name]
         self.label_names = label_names
         self.features = df[self.feature_names].values.copy()
         self.labels = df[self.label_names].values.copy()
         self.instance_names = df.index.astype(str).tolist()
 
-        self.scores = self.labels.copy()
+        if scores_names:
+            self.scores = df[scores_names].values.copy()
+        else:
+            self.scores = self.labels.copy()
 
         df_prot = df.loc[:, protected_attribute_names]
         self.protected_attribute_names = df_prot.columns.astype(str).tolist()

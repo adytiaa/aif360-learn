@@ -1,10 +1,4 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-
 from itertools import product
-# from logging import warn
 
 import numpy as np
 
@@ -542,7 +536,7 @@ class ClassificationMetric(BinaryLabelDatasetMetric):
         .. math::
 
            \tfrac{1}{2}\left[(FPR_{D = \text{unprivileged}} - FPR_{D = \text{privileged}})
-           + (TPR_{D = \text{privileged}} - TPR_{D = \text{unprivileged}}))\right]
+           + (TPR_{D = \text{unprivileged}} - TPR_{D = \text{privileged}}))\right]
 
         A value of 0 indicates equality of odds.
         """
@@ -556,7 +550,7 @@ class ClassificationMetric(BinaryLabelDatasetMetric):
         .. math::
 
            \tfrac{1}{2}\left[|FPR_{D = \text{unprivileged}} - FPR_{D = \text{privileged}}|
-           + |TPR_{D = \text{privileged}} - TPR_{D = \text{unprivileged}}|\right]
+           + |TPR_{D = \text{unprivileged}} - TPR_{D = \text{privileged}}|\right]
 
         A value of 0 indicates equality of odds.
         """

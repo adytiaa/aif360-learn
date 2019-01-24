@@ -1,8 +1,3 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-
 from logging import warning
 
 import numpy as np
@@ -23,12 +18,11 @@ class StandardDataset(BinaryLabelDataset):
     """
 
     def __init__(self, df, label_name, favorable_classes,
-                 protected_attribute_names, privileged_classes,
-                 instance_weights_name='', categorical_features=[],
-                 features_to_keep=[], features_to_drop=[], na_values=[],
-                 custom_preprocessing=None, metadata=None):
-        """
-        Subclasses of StandardDataset should perform the following before
+             protected_attribute_names, privileged_classes,
+             instance_weights_name='', scores_name='', categorical_features=[],
+             features_to_keep=[], features_to_drop=[], na_values=[],
+             custom_preprocessing=None, metadata=None):
+        """Subclasses of StandardDataset should perform the following before
         calling `super().__init__`:
 
             1. Load the dataframe from a raw file.
@@ -147,10 +141,12 @@ class StandardDataset(BinaryLabelDataset):
             df.loc[pos, label_name] = favorable_label
             df.loc[~pos, label_name] = unfavorable_label
 
-        super(StandardDataset, self).__init__(df=df, label_names=[label_name],
+        super(StandardDataset, self).__init__(
+            df=df, label_names=[label_name],
             protected_attribute_names=protected_attribute_names,
             privileged_protected_attributes=privileged_protected_attributes,
             unprivileged_protected_attributes=unprivileged_protected_attributes,
             instance_weights_name=instance_weights_name,
+            scores_names=[scores_name] if scores_name else [],
             favorable_label=favorable_label,
             unfavorable_label=unfavorable_label, metadata=metadata)
