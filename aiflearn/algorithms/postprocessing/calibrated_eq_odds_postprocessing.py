@@ -7,8 +7,8 @@
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
 #
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
 #
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -24,17 +24,13 @@
 # use this file except in compliance with the License. You may obtain a copy of
 # the License at http://www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicable law or agreed to in writing, software distributed
-# under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-# CONDITIONS OF ANY KIND, either express or implied. See the License for the
-# specific language governing permissions and limitations under the License.
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations under
+# the License.
 
 import numpy as np
-# from scipy.optimize import linprog
 
 from aiflearn.algorithms import Transformer
 from aiflearn.metrics import ClassificationMetric, utils
@@ -48,15 +44,15 @@ class CalibratedEqOddsPostprocessing(Transformer):
 
     References:
         .. [7] G. Pleiss, M. Raghavan, F. Wu, J. Kleinberg, and
-           K. Q. Weinberger, "On Fairness and Calibration," Conference on Neural
-           Information Processing Systems, 2017
+           K. Q. Weinberger, "On Fairness and Calibration," Conference on
+            Neural Information Processing Systems, 2017
 
     Adapted from:
     https://github.com/gpleiss/equalized_odds_and_calibration/blob/master/calib_eq_odds.py
     """
 
     def __init__(self, unprivileged_groups, privileged_groups,
-                 cost_constraint='weighted', seed=None):
+                 cost_constraint='weighted', threshold=0.5, seed=None):
         """
         Args:
             unprivileged_groups (dict or list(dict)): Representation for
@@ -64,6 +60,9 @@ class CalibratedEqOddsPostprocessing(Transformer):
             privileged_groups (dict or list(dict)): Representation for
                 privileged group.
             cost_contraint: fpr, fnr or weighted
+            threshold (float): Threshold for converting `scores` to `labels`.
+                Values greater than or equal to this threshold are predicted to
+                be the `favorable_label`. Default is 0.5.
             seed (int, optional): Seed to make `predict` repeatable.
         """
         super(CalibratedEqOddsPostprocessing, self).__init__(
@@ -72,6 +71,7 @@ class CalibratedEqOddsPostprocessing(Transformer):
             seed=seed)
 
         self.seed = seed
+        self.threshold = threshold
         self.model_params = None
         self.unprivileged_groups = [unprivileged_groups] \
             if isinstance(unprivileged_groups, dict) else unprivileged_groups
@@ -121,12 +121,13 @@ class CalibratedEqOddsPostprocessing(Transformer):
         self.base_rate_unpriv = cm.base_rate(privileged=False)
 
         # Create a dataset with "trivial" predictions
-        dataset_trivial = dataset_pred.copy(deepcopy =True)
+        dataset_trivial = dataset_pred.copy(deepcopy=True)
         dataset_trivial.scores[cond_vec_priv] = cm.base_rate(privileged=True)
         dataset_trivial.scores[cond_vec_unpriv] = cm.base_rate(privileged=False)
-        cm_triv = ClassificationMetric(dataset_true, dataset_trivial,
-                                                unprivileged_groups=self.unprivileged_groups,
-                                                privileged_groups=self.privileged_groups)
+        cm_triv = ClassificationMetric(
+            dataset_true, dataset_trivial,
+            unprivileged_groups=self.unprivileged_groups,
+            privileged_groups=self.privileged_groups)
 
         if self.fn_rate == 0:
             priv_cost = cm.generalized_false_positive_rate(privileged=True)
@@ -164,8 +165,6 @@ class CalibratedEqOddsPostprocessing(Transformer):
         """
         if self.seed is not None:
             np.random.seed(self.seed)
-        else:
-            np.random.set_state(np.random.get_state())
 
         cond_vec_priv = utils.compute_boolean_conditioning_vector(
             dataset.protected_attributes,
@@ -176,39 +175,42 @@ class CalibratedEqOddsPostprocessing(Transformer):
             dataset.protected_attribute_names,
             self.unprivileged_groups)
 
-        priv_indices = np.random.permutation(sum(cond_vec_priv))[
-                       :int(self.priv_mix_rate * sum(cond_vec_priv))]
+        priv_indices = (np.random.random(sum(cond_vec_priv))
+                        <= self.priv_mix_rate)
         priv_new_pred = dataset.scores[cond_vec_priv].copy()
         priv_new_pred[priv_indices] = self.base_rate_priv
 
-        unpriv_indices = np.random.permutation(sum(cond_vec_unpriv))[
-                         :int(self.unpriv_mix_rate * sum(cond_vec_unpriv))]
-        unpriv_new_pred = dataset.labels[cond_vec_unpriv].copy()
+        unpriv_indices = (np.random.random(sum(cond_vec_unpriv))
+                          <= self.unpriv_mix_rate)
+        unpriv_new_pred = dataset.scores[cond_vec_unpriv].copy()
         unpriv_new_pred[unpriv_indices] = self.base_rate_unpriv
 
         dataset_new = dataset.copy(deepcopy=True)
 
-        new_scores = np.zeros_like(dataset.scores, dtype=np.float64)
-        new_scores[cond_vec_priv] = priv_new_pred
-        new_scores[cond_vec_unpriv] = unpriv_new_pred
-
-        dataset_new.scores = new_scores
+        dataset_new.scores = np.zeros_like(dataset.scores, dtype=np.float64)
+        dataset_new.scores[cond_vec_priv] = priv_new_pred
+        dataset_new.scores[cond_vec_unpriv] = unpriv_new_pred
 
         # Create labels from scores using a default threshold
+        dataset_new.labels = np.where(dataset_new.scores >= self.threshold,
+                                      dataset_new.favorable_label,
+                                      dataset_new.unfavorable_label)
         return dataset_new
 
     def fit_predict(self, dataset_true, dataset_pred):
         """fit and predict methods sequentially."""
         return self.fit(dataset_true, dataset_pred).predict(dataset_pred)
 
-######### SUPPORTING FUNCTIONS ##########
+
+# SUPPORTING FUNCTIONS
+
 
 def weighted_cost(fp_rate, fn_rate, cm, privileged):
     norm_const = float(fp_rate + fn_rate) if\
                       (fp_rate != 0 and fn_rate != 0) else 1
     return ((fp_rate / norm_const
-            * cm.generalized_false_positive_rate(privileged=privileged)
-            * (1 - cm.base_rate(privileged=privileged))) + \
-           (fn_rate / norm_const
-            * cm.generalized_false_negative_rate(privileged=privileged)
-            * (1 - cm.base_rate(privileged=privileged))))
+             * cm.generalized_false_positive_rate(privileged=privileged)
+             * (1 - cm.base_rate(privileged=privileged))) +
+            (fn_rate / norm_const
+             * cm.generalized_false_negative_rate(privileged=privileged)
+             * (1 - cm.base_rate(privileged=privileged))))
