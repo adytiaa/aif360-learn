@@ -1,7 +1,7 @@
-:mod:`aif360.datasets`
+:mod:`aiflearn.datasets`
 ======================
 
-.. automodule:: aif360.datasets
+.. automodule:: aiflearn.datasets
 
 Base Class
 ----------

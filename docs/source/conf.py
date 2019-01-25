@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# aif360-bias-toolbox documentation build configuration file, created by
+# aiflearn-bias-toolbox documentation build configuration file, created by
 # sphinx-quickstart on Fri Jun  8 14:05:59 2018.
 #
 # This file is execfile()d with the current directory set to its
@@ -20,7 +20,7 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('../..'))
 
-import aif360
+import aiflearn
 
 
 # -- General configuration ------------------------------------------------
@@ -58,9 +58,9 @@ source_suffix = ['.rst', '.md']
 master_doc = 'index'
 
 # General information about the project.
-project = u'aif360'
+project = u'aiflearn'
 copyright = u'2018, IBM Corporation'
-author = u'aif360 developers'
+author = u'aiflearn developers'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -135,7 +135,7 @@ html_static_path = []
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'aif360doc'
+htmlhelp_basename = 'aiflearndoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -162,7 +162,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'aif360.tex', u'AI Fairness 360 Documentation',
+    (master_doc, 'aiflearn.tex', u'AI Fairness 360 Documentation',
      u'IBM Research', 'manual'),
 ]
 
@@ -172,7 +172,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'aif360', u'AI Fairness 360 Documentation',
+    (master_doc, 'aiflearn', u'AI Fairness 360 Documentation',
      [author], 1)
 ]
 
@@ -183,7 +183,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'aif360', u'AI Fairness 360 Documentation',
-     author, 'aif360', 'One line description of project.',
+    (master_doc, 'aiflearn', u'AI Fairness 360 Documentation',
+     author, 'aiflearn', 'One line description of project.',
      'Miscellaneous'),
 ]

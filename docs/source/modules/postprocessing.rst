@@ -1,7 +1,7 @@
-:mod:`aif360.algorithms.postprocessing`
+:mod:`aiflearn.algorithms.postprocessing`
 =======================================
 
-.. automodule:: aif360.algorithms.postprocessing
+.. automodule:: aiflearn.algorithms.postprocessing
 
 Calibrated Equality of Odds
 ---------------------------

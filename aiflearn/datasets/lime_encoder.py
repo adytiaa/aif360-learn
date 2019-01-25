@@ -1,11 +1,11 @@
 import sklearn.preprocessing
 import numpy as np
 
-from aif360.algorithms import Transformer
+from aiflearn.algorithms import Transformer
 
 
 class LimeEncoder(Transformer):
-    """Tranformer for converting aif360 dataset to LIME dataset and vice versa.
+    """Tranformer for converting aiflearn dataset to LIME dataset and vice versa.
 
     (LIME - Local Interpretable Model-Agnostic Explanations) [2]_
 
@@ -22,12 +22,12 @@ class LimeEncoder(Transformer):
         super(LimeEncoder, self).__init__()
 
     def fit(self, dataset):
-        """Take an aif360 dataset and save all relevant metadata as well as
-        mappings needed to transform/inverse_transform the data between aif360
+        """Take an aiflearn dataset and save all relevant metadata as well as
+        mappings needed to transform/inverse_transform the data between aiflearn
         and lime.
 
         Args:
-            dataset (BinaryLabelDataset): aif360 dataset
+            dataset (BinaryLabelDataset): aiflearn dataset
 
         Returns:
             LimeEncoder: Returns self.
@@ -84,17 +84,17 @@ class LimeEncoder(Transformer):
 
         return self
 
-    def transform(self, aif360data):
-        """Take aif360 data array and return data array that is lime encoded
+    def transform(self, aiflearndata):
+        """Take aiflearn data array and return data array that is lime encoded
         (numeric array in which categorical features are NOT one-hot-encoded).
 
         Args:
-            aif360data (np.ndarray): Dataset features
+            aiflearndata (np.ndarray): Dataset features
 
         Returns:
             np.ndarray: LIME dataset features
         """
-        tgtNumRows = aif360data.shape[0]
+        tgtNumRows = aiflearndata.shape[0]
         tgtNumcolumns = len(self.s_feature_names)
         limedata = np.zeros(shape=(tgtNumRows, tgtNumcolumns))
 
@@ -107,7 +107,7 @@ class LimeEncoder(Transformer):
                     # is also a protected attribute
                     if feature in self.s_protected_attribute_names:
                         # just copy the value as is
-                        limedata[rw, ind] = aif360data[
+                        limedata[rw, ind] = aiflearndata[
                             rw,
                             self.s_feature_names_with_ohe.index(feature)]
                     else:
@@ -115,41 +115,41 @@ class LimeEncoder(Transformer):
                         for indc in range(len(possible_feature_values)):
                             cval = possible_feature_values[indc]
                             colName = feature + "=" + cval
-                            if (aif360data[rw][
+                            if (aiflearndata[rw][
                                     self.s_feature_names_with_ohe.index(
                                         colName)] == 1.0):
                                 limedata[rw][ind] = indc
                 else:
                     # just copy the value as is
-                    limedata[rw, ind] = aif360data[
+                    limedata[rw, ind] = aiflearndata[
                         rw, self.s_feature_names_with_ohe.index(feature)]
 
         return limedata
 
     def inverse_transform(self, limedata):
         """Take data array that is lime encoded (that is, lime-compatible data
-        created by this class from a given aif360 dataset) and return data
-        array consistent with the original aif360 dataset.
+        created by this class from a given aiflearn dataset) and return data
+        array consistent with the original aiflearn dataset.
 
         Args:
             limedata (np.ndarray): Dataset features
 
         Returns:
-            np.ndarray: aif360 dataset features
+            np.ndarray: aiflearn dataset features
         """
         tgtNumRows = limedata.shape[0]
         tgtNumcolumns = len(self.s_feature_names_with_ohe)
-        aif360data = np.zeros(shape=(tgtNumRows, tgtNumcolumns))
+        aiflearndata = np.zeros(shape=(tgtNumRows, tgtNumcolumns))
         feature_names = self.s_feature_names_with_ohe
 
-        for rw in range(aif360data.shape[0]):
+        for rw in range(aiflearndata.shape[0]):
             for ind, feature in enumerate(self.s_feature_names):
                 # s_categorical_features has list of indexes into
                 # s_feature_names for categorical features
                 if ind in self.s_categorical_features:
                     if feature in self.s_protected_attribute_names:
                         # just copy the value as is
-                        aif360data[rw, feature_names.index(feature)] = \
+                        aiflearndata[rw, feature_names.index(feature)] = \
                             limedata[rw, ind]
                     else:
                         # s_categorical_names[ind] has mapping of categorical
@@ -159,10 +159,10 @@ class LimeEncoder(Transformer):
                                        self.s_categorical_names[ind][
                                            int(limedata[rw, ind])])
                         # categorical feature:
-                        aif360data[rw, self.s_feature_names_with_ohe.index(
+                        aiflearndata[rw, self.s_feature_names_with_ohe.index(
                             new_feature)] = 1.0
                 else:  # just copy value
-                    aif360data[rw, self.s_feature_names_with_ohe.index(
+                    aiflearndata[rw, self.s_feature_names_with_ohe.index(
                         feature)] = limedata[rw, ind]
 
-        return aif360data
+        return aiflearndata

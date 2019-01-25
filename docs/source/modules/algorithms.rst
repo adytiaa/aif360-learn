@@ -1,7 +1,7 @@
-:mod:`aif360.algorithms`
+:mod:`aiflearn.algorithms`
 ========================
 
-.. automodule:: aif360.algorithms
+.. automodule:: aiflearn.algorithms
 
 .. toctree::
    :maxdepth: 2

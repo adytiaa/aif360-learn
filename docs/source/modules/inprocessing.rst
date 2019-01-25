@@ -1,7 +1,7 @@
-:mod:`aif360.algorithms.inprocessing`
+:mod:`aiflearn.algorithms.inprocessing`
 =====================================
 
-.. automodule:: aif360.algorithms.inprocessing
+.. automodule:: aiflearn.algorithms.inprocessing
 
 Adversarial Debiasing
 ---------------------

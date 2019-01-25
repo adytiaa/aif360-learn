@@ -9,7 +9,7 @@ if "%SPHINXBUILD%" == "" (
 )
 set SOURCEDIR=source
 set BUILDDIR=build
-set SPHINXPROJ=aif360
+set SPHINXPROJ=aiflearn
 
 if "%1" == "" goto help
 

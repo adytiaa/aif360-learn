@@ -1,7 +1,7 @@
-:mod:`aif360.algorithms.preprocessing`
+:mod:`aiflearn.algorithms.preprocessing`
 ======================================
 
-.. automodule:: aif360.algorithms.preprocessing
+.. automodule:: aiflearn.algorithms.preprocessing
 
 Disparate Impact Remover
 ------------------------

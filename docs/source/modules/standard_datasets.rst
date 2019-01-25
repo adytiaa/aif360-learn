@@ -1,4 +1,4 @@
-.. module:: aif360.datasets
+.. module:: aiflearn.datasets
 
 Base Class
 ----------

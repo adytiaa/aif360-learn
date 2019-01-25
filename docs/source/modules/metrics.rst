@@ -1,7 +1,7 @@
-:mod:`aif360.metrics`
+:mod:`aiflearn.metrics`
 =====================
 
-.. automodule:: aif360.metrics
+.. automodule:: aiflearn.metrics
 
 Dataset Metric
 --------------
@@ -32,5 +32,5 @@ Sample Distortion Metric
 Utility Functions
 -----------------
 
-.. automodule:: aif360.metrics.utils
+.. automodule:: aiflearn.metrics.utils
     :members:

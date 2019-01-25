@@ -1,7 +1,7 @@
-:mod:`aif360.explainers`
+:mod:`aiflearn.explainers`
 ========================
 
-.. automodule:: aif360.explainers
+.. automodule:: aiflearn.explainers
 
 Metric Text Explainer
 ---------------------
