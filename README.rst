@@ -1,6 +1,9 @@
 .. -*- mode: rst -*-
 
-|Travis|_ |Codecov|_ |CircleCI|_ |Python35|_
+|Documentation|_ |Travis|_ |Codecov|_ |CircleCI|_ |Python35|_
+
+.. |Documentation| image:: https://readthedocs.org/projects/aif360-learn/badge/?version=master
+.. _Documentation: https://aif360-learn.readthedocs.io/en/master/?badge=master
 
 .. |Travis| image:: https://api.travis-ci.org/aif360-learn/aif360-learn.svg?branch=master
 .. _Travis: https://travis-ci.org/aif360-learn/aif360-learn
