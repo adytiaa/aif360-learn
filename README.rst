@@ -26,8 +26,23 @@ open-source library to help detect and remove bias in machine learning models.
 This project focuses on making *aif360* compatible with *scikit-learn*, and
 hence called *aif360-learn*.
 
-This project started as a fork of `IBM/AIF360
-<https://github.com/IBM/AIF360>`_, and slowly it will move further away from
+There are two potential approaches in order to have a *scikit-learn* compatible
+library:
+
+- A wrapper library which depends on AIF360.
+- A fork of AIF360 with necessary changes applied to it.
+
+This fork is taking the latter approach for the following reasons:
+
+- Compatibility with the upstream (python and dependencies), and dropped
+  Python2 support.
+- Have the related communication on public channels
+- Encourage researchers and the community to include more algorithms in the
+  library and help them on the way for their methods to better reach a wider
+  community
+
+Hence, this project started as a fork of `IBM/AIF360
+<https://github.com/IBM/AIF360>`_, and will slowly move further away from
 it. As a result, most of the content is what you see on the original
 repository, for a while.
 
