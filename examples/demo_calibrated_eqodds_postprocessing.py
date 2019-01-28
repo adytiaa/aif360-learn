@@ -1,27 +1,29 @@
-#!/usr/bin/env python
-# coding: utf-8
+"""
+This notebook demonstrates the use of an odds-equalizing post-processing
+algorithm for bias mitigiation.
 
-# #### This notebook demonstrates the use of an odds-equalizing post-processing algorithm for bias mitigiation.
+"""
+
 # 
 
 
 # Load all necessary packages
 import sys
 import numpy as np
-import pandas as pd
+
 
 sys.path.append("../")
 from aiflearn.datasets import AdultDataset, GermanDataset, CompasDataset
 from aiflearn.metrics import BinaryLabelDatasetMetric
 from aiflearn.metrics import ClassificationMetric
 
-from aiflearn.algorithms.preprocessing.optim_preproc_helpers.data_preproc_functions import \
-    load_preproc_data_compas
+from aiflearn.algorithms.preprocessing.optim_preproc_helpers.data_preproc_functions \
+    import load_preproc_data_compas
 
 from IPython.display import Markdown, display
 import matplotlib.pyplot as plt
 
-# ### Fairness metrics for original dataset
+# Fairness metrics for original dataset
 
 # In[2]:
 
@@ -59,7 +61,7 @@ elif dataset_used == "compas":
         privileged_groups = [{'race': 1}]
         unprivileged_groups = [{'race': 0}]
 
-    # cost constraint of fnr will optimize generalized false negative rates, that of
+# cost constraint of fnr will optimize generalized false negative rates, that of
 # fpr will optimize generalized false positive rates, and weighted will optimize
 # a weighted combination of both
 cost_constraint = "fnr"  # "fnr", "fpr", "weighted"
@@ -81,7 +83,7 @@ dataset_orig_valid, dataset_orig_test = dataset_orig_vt.split([0.5],
 
 
 # print out some labels, names, etc.
-display(Markdown("#### Dataset shape"))
+#### Dataset shape
 print(dataset_orig_train.features.shape)
 display(Markdown("#### Favorable and unfavorable labels"))
 print(dataset_orig_train.favorable_label, dataset_orig_train.unfavorable_label)
@@ -101,23 +103,26 @@ print(dataset_orig_train.feature_names)
 metric_orig_train = BinaryLabelDatasetMetric(dataset_orig_train,
                                              unprivileged_groups=unprivileged_groups,
                                              privileged_groups=privileged_groups)
-display(Markdown("#### Original training dataset"))
+# Original training dataset
 print(
-    "Difference in mean outcomes between unprivileged and privileged groups = %f" % metric_orig_train.mean_difference())
+    "Difference in mean outcomes between unprivileged and privileged groups = %f"
+    % metric_orig_train.mean_difference())
 
 metric_orig_valid = BinaryLabelDatasetMetric(dataset_orig_valid,
                                              unprivileged_groups=unprivileged_groups,
                                              privileged_groups=privileged_groups)
-display(Markdown("#### Original validation dataset"))
+# Original validation dataset
 print(
-    "Difference in mean outcomes between unprivileged and privileged groups = %f" % metric_orig_valid.mean_difference())
+    "Difference in mean outcomes between unprivileged and privileged groups = %f"
+    % metric_orig_valid.mean_difference())
 
 metric_orig_test = BinaryLabelDatasetMetric(dataset_orig_test,
                                             unprivileged_groups=unprivileged_groups,
                                             privileged_groups=privileged_groups)
-display(Markdown("#### Original test dataset"))
+# Original test dataset
 print(
-    "Difference in mean outcomes between unprivileged and privileged groups = %f" % metric_orig_test.mean_difference())
+    "Difference in mean outcomes between unprivileged and privileged groups = %f"
+    % metric_orig_test.mean_difference())
 
 # ### Train classifier (logistic regression on original training data)
 
@@ -188,7 +193,7 @@ cm_pred_train = ClassificationMetric(dataset_orig_train,
                                      dataset_orig_train_pred,
                                      unprivileged_groups=unprivileged_groups,
                                      privileged_groups=privileged_groups)
-display(Markdown("#### Original-Predicted training dataset"))
+# Original-Predicted training dataset
 print("Difference in GFPR between unprivileged and privileged groups")
 print(cm_pred_train.difference(cm_pred_train.generalized_false_positive_rate))
 print("Difference in GFNR between unprivileged and privileged groups")
@@ -198,7 +203,7 @@ cm_pred_valid = ClassificationMetric(dataset_orig_valid,
                                      dataset_orig_valid_pred,
                                      unprivileged_groups=unprivileged_groups,
                                      privileged_groups=privileged_groups)
-display(Markdown("#### Original-Predicted validation dataset"))
+# Original-Predicted validation dataset
 print("Difference in GFPR between unprivileged and privileged groups")
 print(cm_pred_valid.difference(cm_pred_valid.generalized_false_positive_rate))
 print("Difference in GFNR between unprivileged and privileged groups")
@@ -207,7 +212,7 @@ print(cm_pred_valid.difference(cm_pred_valid.generalized_false_negative_rate))
 cm_pred_test = ClassificationMetric(dataset_orig_test, dataset_orig_test_pred,
                                     unprivileged_groups=unprivileged_groups,
                                     privileged_groups=privileged_groups)
-display(Markdown("#### Original-Predicted testing dataset"))
+# Original-Predicted testing dataset
 print("Difference in GFPR between unprivileged and privileged groups")
 print(cm_pred_test.difference(cm_pred_test.generalized_false_positive_rate))
 print("Difference in GFNR between unprivileged and privileged groups")
@@ -247,7 +252,7 @@ cm_transf_valid = ClassificationMetric(dataset_orig_valid,
                                        dataset_transf_valid_pred,
                                        unprivileged_groups=unprivileged_groups,
                                        privileged_groups=privileged_groups)
-display(Markdown("#### Original-Transformed validation dataset"))
+# Original-Transformed validation dataset
 print("Difference in GFPR between unprivileged and privileged groups")
 print(
     cm_transf_valid.difference(cm_transf_valid.generalized_false_positive_rate))
@@ -259,7 +264,7 @@ cm_transf_test = ClassificationMetric(dataset_orig_test,
                                       dataset_transf_test_pred,
                                       unprivileged_groups=unprivileged_groups,
                                       privileged_groups=privileged_groups)
-display(Markdown("#### Original-Transformed testing dataset"))
+# Original-Transformed testing dataset
 print("Difference in GFPR between unprivileged and privileged groups")
 print(cm_transf_test.difference(cm_transf_test.generalized_false_positive_rate))
 print("Difference in GFNR between unprivileged and privileged groups")
@@ -278,8 +283,7 @@ assert np.abs(cm_transf_valid.difference(
 
 # Thresholds
 all_thresh = np.linspace(0.01, 0.99, 25)
-display(Markdown(
-    "#### Classification thresholds used for validation and parameter selection"))
+# Classification thresholds used for validation and parameter selection
 
 bef_avg_odds_diff_test = []
 bef_avg_odds_diff_valid = []
@@ -300,30 +304,38 @@ for thresh in tqdm(all_thresh):
     # Labels for the datasets from scores
     y_temp = np.zeros_like(dataset_orig_valid_pred_thresh.labels)
     y_temp[
-        dataset_orig_valid_pred_thresh.scores >= thresh] = dataset_orig_valid_pred_thresh.favorable_label
+        dataset_orig_valid_pred_thresh.scores >= thresh] =\
+        dataset_orig_valid_pred_thresh.favorable_label
     y_temp[~(
-                dataset_orig_valid_pred_thresh.scores >= thresh)] = dataset_orig_valid_pred_thresh.unfavorable_label
+                dataset_orig_valid_pred_thresh.scores >= thresh)] = \
+        dataset_orig_valid_pred_thresh.unfavorable_label
     dataset_orig_valid_pred_thresh.labels = y_temp
 
     y_temp = np.zeros_like(dataset_orig_test_pred_thresh.labels)
     y_temp[
-        dataset_orig_test_pred_thresh.scores >= thresh] = dataset_orig_test_pred_thresh.favorable_label
+        dataset_orig_test_pred_thresh.scores >= thresh] = \
+        dataset_orig_test_pred_thresh.favorable_label
     y_temp[~(
-                dataset_orig_test_pred_thresh.scores >= thresh)] = dataset_orig_test_pred_thresh.unfavorable_label
+                dataset_orig_test_pred_thresh.scores >= thresh)] = \
+        dataset_orig_test_pred_thresh.unfavorable_label
     dataset_orig_test_pred_thresh.labels = y_temp
 
     y_temp = np.zeros_like(dataset_transf_valid_pred_thresh.labels)
     y_temp[
-        dataset_transf_valid_pred_thresh.scores >= thresh] = dataset_transf_valid_pred_thresh.favorable_label
+        dataset_transf_valid_pred_thresh.scores >= thresh] = \
+        dataset_transf_valid_pred_thresh.favorable_label
     y_temp[~(
-                dataset_transf_valid_pred_thresh.scores >= thresh)] = dataset_transf_valid_pred_thresh.unfavorable_label
+                dataset_transf_valid_pred_thresh.scores >= thresh)] = \
+        dataset_transf_valid_pred_thresh.unfavorable_label
     dataset_transf_valid_pred_thresh.labels = y_temp
 
     y_temp = np.zeros_like(dataset_transf_test_pred_thresh.labels)
     y_temp[
-        dataset_transf_test_pred_thresh.scores >= thresh] = dataset_transf_test_pred_thresh.favorable_label
+        dataset_transf_test_pred_thresh.scores >= thresh] = \
+        dataset_transf_test_pred_thresh.favorable_label
     y_temp[~(
-                dataset_transf_test_pred_thresh.scores >= thresh)] = dataset_transf_test_pred_thresh.unfavorable_label
+                dataset_transf_test_pred_thresh.scores >= thresh)] = \
+        dataset_transf_test_pred_thresh.unfavorable_label
     dataset_transf_test_pred_thresh.labels = y_temp
 
     # Metrics for original validation data

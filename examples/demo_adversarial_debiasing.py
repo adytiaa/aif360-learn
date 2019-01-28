@@ -21,9 +21,9 @@ from sklearn.preprocessing import MaxAbsScaler, StandardScaler
 
 from aiflearn.algorithms.inprocessing.adversarial_debiasing import \
     AdversarialDebiasing
-from aiflearn.algorithms.preprocessing.optim_preproc_helpers.data_preproc_functions import (
-    load_preproc_data_adult, load_preproc_data_compas,
-    load_preproc_data_german)
+from aiflearn.algorithms.preprocessing.optim_preproc_helpers.data_preproc_functions\
+    import (load_preproc_data_adult , load_preproc_data_compas, load_preproc_data_german)
+
 from aiflearn.datasets import (AdultDataset, BinaryLabelDataset,
                                CompasDataset,
                                GermanDataset)
@@ -32,7 +32,7 @@ from aiflearn.metrics.utils import compute_boolean_conditioning_vector
 
 sys.path.append("../")
 
-# #### Load dataset and set options
+# Load dataset and set options
 
 # In[2]:
 
@@ -47,14 +47,13 @@ dataset_orig_train, dataset_orig_test = dataset_orig.split([0.7], shuffle=True)
 # In[3]:
 
 # print out some labels, names, etc.
-# Training Dataset shape"
+# Training Dataset shape
 print(dataset_orig_train.features.shape)
-display(Markdown("#### Favorable and unfavorable labels"))
+# Favorable and unfavorable labels
 print(dataset_orig_train.favorable_label, dataset_orig_train.unfavorable_label)
 display(Markdown("#### Protected attribute names"))
 print(dataset_orig_train.protected_attribute_names)
-display(
-    Markdown("#### Privileged and unprivileged protected attribute values"))
+# Privileged and unprivileged protected attribute values
 print(dataset_orig_train.privileged_protected_attributes,
       dataset_orig_train.unprivileged_protected_attributes)
 display(Markdown("#### Dataset feature names"))
@@ -94,19 +93,20 @@ metric_scaled_train = BinaryLabelDatasetMetric(
     dataset_orig_train,
     unprivileged_groups=unprivileged_groups,
     privileged_groups=privileged_groups)
-display(
-    Markdown(
-        "#### Scaled dataset - Verify that the scaling does not affect the group label statistics"
-    ))
+# Scaled dataset - Verify that the scaling does not affect the group label
+# statistics
+
 print(
-    "Train set: Difference in mean outcomes between unprivileged and privileged groups = %f"
+    "Train set: Difference in mean outcomes between unprivileged and privileged "
+    "groups = %f"
     % metric_scaled_train.mean_difference())
 metric_scaled_test = BinaryLabelDatasetMetric(
     dataset_orig_test,
     unprivileged_groups=unprivileged_groups,
     privileged_groups=privileged_groups)
 print(
-    "Test set: Difference in mean outcomes between unprivileged and privileged groups = %f"
+    "Test set: Difference in mean outcomes between unprivileged and privileged "
+    "groups = %f"
     % metric_scaled_test.mean_difference())
 
 # ### Learn plan classifier without debiasing
@@ -143,7 +143,8 @@ metric_dataset_nodebiasing_train = BinaryLabelDatasetMetric(
     privileged_groups=privileged_groups)
 
 print(
-    "Train set: Difference in mean outcomes between unprivileged and privileged groups = %f"
+    "Train set: Difference in mean outcomes between unprivileged and privileged"
+    "groups = %f"
     % metric_dataset_nodebiasing_train.mean_difference())
 
 metric_dataset_nodebiasing_test = BinaryLabelDatasetMetric(
@@ -152,7 +153,8 @@ metric_dataset_nodebiasing_test = BinaryLabelDatasetMetric(
     privileged_groups=privileged_groups)
 
 print(
-    "Test set: Difference in mean outcomes between unprivileged and privileged groups = %f"
+    "Test set: Difference in mean outcomes between unprivileged and privileged "
+    "groups = %f"
     % metric_dataset_nodebiasing_test.mean_difference())
 
 display(
@@ -209,23 +211,26 @@ dataset_debiasing_test = debiased_model.predict(dataset_orig_test)
 # In[14]:
 
 # Metrics for the dataset from plain model (without debiasing)
-display(Markdown("#### Plain model - without debiasing - dataset metrics"))
+# Plain model - without debiasing - dataset metrics
 print(
-    "Train set: Difference in mean outcomes between unprivileged and privileged groups = %f"
+    "Train set: Difference in mean outcomes between unprivileged and privileged"
+    " groups = %f"
     % metric_dataset_nodebiasing_train.mean_difference())
 print(
-    "Test set: Difference in mean outcomes between unprivileged and privileged groups = %f"
+    "Test set: Difference in mean outcomes between unprivileged and privileged"
+    " groups = %f"
     % metric_dataset_nodebiasing_test.mean_difference())
 
 # Metrics for the dataset from model with debiasing
-display(Markdown("#### Model - with debiasing - dataset metrics"))
+# Model - with debiasing - dataset metrics
 metric_dataset_debiasing_train = BinaryLabelDatasetMetric(
     dataset_debiasing_train,
     unprivileged_groups=unprivileged_groups,
     privileged_groups=privileged_groups)
 
 print(
-    "Train set: Difference in mean outcomes between unprivileged and privileged groups = %f"
+    "Train set: Difference in mean outcomes between unprivileged and privileged"
+    " groups = %f"
     % metric_dataset_debiasing_train.mean_difference())
 
 metric_dataset_debiasing_test = BinaryLabelDatasetMetric(
@@ -234,11 +239,11 @@ metric_dataset_debiasing_test = BinaryLabelDatasetMetric(
     privileged_groups=privileged_groups)
 
 print(
-    "Test set: Difference in mean outcomes between unprivileged and privileged groups = %f"
+    "Test set: Difference in mean outcomes between unprivileged and privileged "
+    "groups = %f"
     % metric_dataset_debiasing_test.mean_difference())
 
-display(
-    Markdown("#### Plain model - without debiasing - classification metrics"))
+# Plain model - without debiasing - classification metrics
 print("Test set: Classification accuracy = %f" %
       classified_metric_nodebiasing_test.accuracy())
 TPR = classified_metric_nodebiasing_test.true_positive_rate()
@@ -255,7 +260,7 @@ print("Test set: Average odds difference = %f" %
 print("Test set: Theil_index = %f" %
       classified_metric_nodebiasing_test.theil_index())
 
-display(Markdown("#### Model - with debiasing - classification metrics"))
+# Model - with debiasing - classification metrics
 classified_metric_debiasing_test = ClassificationMetric(
     dataset_orig_test,
     dataset_debiasing_test,
@@ -279,7 +284,8 @@ print("Test set: Theil_index = %f" %
 
 #
 #     References:
-#     [1] B. H. Zhang, B. Lemoine, and M. Mitchell, "Mitigating UnwantedBiases with Adversarial Learning,"
+#     [1] B. H. Zhang, B. Lemoine, and M. Mitchell, "Mitigating UnwantedBiases
+#     with Adversarial Learning,"
 #     AAAI/ACM Conference on Artificial Intelligence, Ethics, and Society, 2018.
 
 # In[ ]:

@@ -1,16 +1,13 @@
-#!/usr/bin/env python
-# coding: utf-8
+"""
+This notebook demonstrates how LIME - Local Interpretable Model-Agnostic
+Explanations can be used with models learnt with the AIF 360 toolkit to
+generate explanations for model predictions.
 
-# # This notebook demonstrates how LIME - Local Interpretable Model-Agnostic Explanations can be used with models learnt with the AIF 360 toolkit to generate explanations for model predictions.
-# 
-# For more information on LIME, see [https://github.com/marcotcr/lime](https://github.com/marcotcr/lime).
-
-# In[1]:
-
+ For more information on LIME, see [https://github.com/marcotcr/lime]
+ (https://github.com/marcotcr/lime).
+"""
 
 from __future__ import print_function
-
-get_ipython().run_line_magic('matplotlib', 'inline')
 
 import sklearn.model_selection
 import sklearn.metrics
@@ -28,7 +25,8 @@ import numpy as np
 from aiflearn.datasets import BinaryLabelDataset
 from aiflearn.metrics.binary_label_dataset_metric import BinaryLabelDatasetMetric
 from aiflearn.metrics.classification_metric import ClassificationMetric
-from aiflearn.algorithms.preprocessing.optim_preproc_helpers.data_preproc_functions import load_preproc_data_adult
+# from aiflearn.algorithms.preprocessing.optim_preproc_helpers.data_preproc_
+# functions import load_preproc_data_adult
 from aiflearn.algorithms.preprocessing.reweighing import Reweighing
 
 
@@ -48,7 +46,6 @@ from aiflearn.datasets.adult_dataset import AdultDataset
 
 # **Load dataset and display statistics**
 
-# In[2]:
 
 
 np.random.seed(1)
@@ -57,7 +54,6 @@ dataset_orig = AdultDataset()
 dataset_orig_train, dataset_orig_test = dataset_orig.split([0.7], shuffle=True)
 
 
-# In[3]:
 
 
 # Metric for the original dataset
@@ -68,13 +64,12 @@ unprivileged_groups = [{sens_attr:dataset_orig_train.unprivileged_protected_attr
 metric_orig_train = BinaryLabelDatasetMetric(dataset_orig_train, 
                                              unprivileged_groups=unprivileged_groups,
                                              privileged_groups=privileged_groups)
-display(Markdown("#### Original training dataset"))
-print("Difference in mean outcomes between privileged and unprivileged groups = %f" % metric_orig_train.mean_difference())
+# Original training dataset
+print("Difference in mean outcomes between privileged and unprivileged groups = %f"
+      % metric_orig_train.mean_difference())
 
 
 # **Transform the data using the Re-Weighing (pre-processing) algorithm**
-
-# In[4]:
 
 
 RW = Reweighing(unprivileged_groups=unprivileged_groups,
@@ -85,29 +80,26 @@ dataset_transf_train = RW.transform(dataset_orig_train)
 
 # **Learn and test models from the transformed data using Logistic Regression**
 
-# In[5]:
-
 
 #Train model on given dataset
+# data to train on
+dataset = dataset_transf_train
+# remember the scale
+scale = StandardScaler().fit(dataset.features)
+# model to learn
 
-dataset = dataset_transf_train  # data to train on
-
-scale = StandardScaler().fit(dataset.features)   # remember the scale
-
-model = LogisticRegression()        # model to learn
-
-X_train = scale.transform(dataset.features)      #apply the scale
+model = LogisticRegression()
+# apply the scale
+X_train = scale.transform(dataset.features)
 y_train = dataset.labels.ravel()
 
 
 model.fit(X_train, y_train, sample_weight=dataset.instance_weights)
 
-#save model
+# save model
 lr_orig = model
 lr_scale_orig = scale
 
-
-# In[6]:
 
 
 #Test model on given dataset and find threshold for best balanced accuracy
@@ -117,10 +109,13 @@ thresh_arr = np.linspace(0.01, 0.5, 50)
 
 scale = lr_scale_orig
 
-model = lr_orig                  #model to test
-dataset = dataset_orig_test        #data to test on
+model = lr_orig
+# model to test
+dataset = dataset_orig_test
+# data to test on
 
-X_test = scale.transform(dataset.features)   #apply the same scale as applied to the training data
+X_test = scale.transform(dataset.features)
+# apply the same scale as applied to the training data
 y_test = dataset.labels.ravel()
 y_test_pred_prob = model.predict_proba(X_test)
 
@@ -162,8 +157,6 @@ disp_imp_at_best_bal_acc = np.abs(1.0-np.array(disp_imp_arr))[thresh_arr_best_in
 avg_odds_diff_at_best_bal_acc = avg_odds_diff_arr[thresh_arr_best_ind]
 
 
-# In[7]:
-
 
 #Plot balanced accuracy, abs(1-disparate impact)
 
@@ -185,10 +178,8 @@ ax2.yaxis.set_tick_params(labelsize=14)
 ax2.grid(True)
 
 
-# In[8]:
 
-
-#Plot average odds difference
+# Plot average odds difference
 fig, ax1 = plt.subplots(figsize=(10,7))
 ax1.plot(thresh_arr, bal_acc_arr)
 ax1.set_xlabel('Classification Thresholds', fontsize=16, fontweight='bold')
@@ -206,22 +197,23 @@ ax2.yaxis.set_tick_params(labelsize=14)
 ax2.grid(True)
 
 
-# In[9]:
-
 
 rf_thresh_arr_orig_best = thresh_arr_best
-print("Threshold corresponding to Best balance accuracy: %6.4f" % rf_thresh_arr_orig_best)
+print("Threshold corresponding to Best balance accuracy: %6.4f"
+      % rf_thresh_arr_orig_best)
 rf_best_bal_acc_arr_orig = best_bal_acc
 print("Best balance accuracy: %6.4f" % rf_best_bal_acc_arr_orig)
 rf_disp_imp_at_best_bal_acc_orig = disp_imp_at_best_bal_acc
-print("Corresponding abs(1-disparate impact) value: %6.4f" % rf_disp_imp_at_best_bal_acc_orig)
+print("Corresponding abs(1-disparate impact) value: %6.4f"
+      % rf_disp_imp_at_best_bal_acc_orig)
 rf_avg_odds_diff_at_best_bal_acc_orig = avg_odds_diff_at_best_bal_acc
-print("Corresponding average odds difference value: %6.4f" % rf_avg_odds_diff_at_best_bal_acc_orig)
+print("Corresponding average odds difference value: %6.4f"
+      % rf_avg_odds_diff_at_best_bal_acc_orig)
 
 
-# ** Use LIME to generate explanations for predictions made using the learnt Logistic Regression model**
+# ** Use LIME to generate explanations for predictions made using the learnt
+# Logistic Regression model**
 
-# In[10]:
 
 
 limeData = LimeEncoder().fit(dataset_orig_train)
@@ -229,9 +221,8 @@ s_train = limeData.transform(dataset_orig_train.features)
 s_test = limeData.transform(dataset_orig_test.features)
 
 scale = lr_scale_orig
-
-model = lr_orig                  #model to test
-
+# model to test
+model = lr_orig
 
 
 
@@ -258,18 +249,19 @@ print("        Actual label: " + str(dataset_orig_test.labels[i2]))
 
 # **Learn and test models from the transformed data using Random Forests**
 
-# In[11]:
 
 
-#Train model on given dataset
+# Train model on given dataset
 
-dataset = dataset_transf_train  # data to train on
+dataset = dataset_transf_train
 
-scale = StandardScaler().fit(dataset.features)   # remember the scale
+scale = StandardScaler().fit(dataset.features)
 
-model = sklearn.ensemble.RandomForestClassifier(n_estimators=500)       # model to learn
+model = sklearn.ensemble.RandomForestClassifier(n_estimators=500)
+# model to learn
 
-X_train = scale.transform(dataset.features)      #apply the scale
+X_train = scale.transform(dataset.features)
+#apply the scale
 y_train = dataset.labels.ravel()
 
 
@@ -280,7 +272,6 @@ rf_orig = model
 rf_scale_orig = scale
 
 
-# In[12]:
 
 
 #Test model on given dataset and find threshold for best balanced accuracy
@@ -290,10 +281,13 @@ thresh_arr = np.linspace(0.01, 0.5, 50)
 
 scale = rf_scale_orig
 
-model = rf_orig                  #model to test
-dataset = dataset_orig_test        #data to test on
+model = rf_orig
+#model to test
+dataset = dataset_orig_test
+#data to test on
 
-X_test = scale.transform(dataset.features)   #apply the same scale as applied to the training data
+X_test = scale.transform(dataset.features)
+#apply the same scale as applied to the training data
 y_test = dataset.labels.ravel()
 y_test_pred_prob = model.predict_proba(X_test)
 
@@ -335,7 +329,6 @@ disp_imp_at_best_bal_acc = np.abs(1.0-np.array(disp_imp_arr))[thresh_arr_best_in
 avg_odds_diff_at_best_bal_acc = avg_odds_diff_arr[thresh_arr_best_ind]
 
 
-# In[13]:
 
 
 #Plot balanced accuracy, abs(1-disparate impact)
@@ -358,7 +351,6 @@ ax2.yaxis.set_tick_params(labelsize=14)
 ax2.grid(True)
 
 
-# In[14]:
 
 
 #Plot average odds difference
@@ -379,22 +371,24 @@ ax2.yaxis.set_tick_params(labelsize=14)
 ax2.grid(True)
 
 
-# In[15]:
 
 
 rf_thresh_arr_orig_best = thresh_arr_best
-print("Threshold corresponding to Best balance accuracy: %6.4f" % rf_thresh_arr_orig_best)
+print("Threshold corresponding to Best balance accuracy: %6.4f"
+      % rf_thresh_arr_orig_best)
 rf_best_bal_acc_arr_orig = best_bal_acc
 print("Best balance accuracy: %6.4f" % rf_best_bal_acc_arr_orig)
 rf_disp_imp_at_best_bal_acc_orig = disp_imp_at_best_bal_acc
-print("Corresponding abs(1-disparate impact) value: %6.4f" % rf_disp_imp_at_best_bal_acc_orig)
+print("Corresponding abs(1-disparate impact) value: %6.4f"
+      % rf_disp_imp_at_best_bal_acc_orig)
 rf_avg_odds_diff_at_best_bal_acc_orig = avg_odds_diff_at_best_bal_acc
-print("Corresponding average odds difference value: %6.4f" % rf_avg_odds_diff_at_best_bal_acc_orig)
+print("Corresponding average odds difference value: %6.4f"
+      % rf_avg_odds_diff_at_best_bal_acc_orig)
 
 
-# ** Use LIME to generate explanations for predictions made using the learnt Logistic Regression model**
+# ** Use LIME to generate explanations for predictions made using the learnt
+# Logistic Regression model**
 
-# In[16]:
 
 
 limeData = LimeEncoder().fit(dataset_orig_train)
@@ -403,10 +397,8 @@ s_test = limeData.transform(dataset_orig_test.features)
 
 scale = rf_scale_orig
 
-model = rf_orig                  #model to test
-
-
-
+model = rf_orig
+#model to test
 
 explainer = lime.lime_tabular.LimeTabularExplainer(s_train ,class_names=limeData.s_class_names, 
                                                    feature_names = limeData.s_feature_names,
@@ -416,8 +408,8 @@ explainer = lime.lime_tabular.LimeTabularExplainer(s_train ,class_names=limeData
 
 s_predict_fn = lambda x: model.predict_proba(scale.transform(limeData.inverse_transform(x)))
 
-import random
-print("Threshold corresponding to Best balance accuracy: %6.4f" % rf_thresh_arr_orig_best)
+print("Threshold corresponding to Best balance accuracy: %6.4f"
+      % rf_thresh_arr_orig_best)
 
 exp = explainer.explain_instance(s_test[i1], s_predict_fn, num_features=5)
 exp.show_in_notebook(show_all=False)

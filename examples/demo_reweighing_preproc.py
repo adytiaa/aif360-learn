@@ -1,13 +1,10 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# #### This notebook demonstrates the use of a reweighing pre-processing algorithm for bias mitigation
-# 
+"""
+This notebook demonstrates the use of a reweighing pre-processing
+algorithm for bias mitigation.
+"""
 
 # In[1]:
 
-
-get_ipython().run_line_magic('matplotlib', 'inline')
 # Load all necessary packages
 import sys
 sys.path.append("../")
@@ -19,10 +16,11 @@ from aiflearn.datasets import AdultDataset, GermanDataset, CompasDataset
 from aiflearn.metrics import BinaryLabelDatasetMetric
 from aiflearn.metrics import ClassificationMetric
 from aiflearn.algorithms.preprocessing.reweighing import Reweighing
-from aiflearn.algorithms.preprocessing.optim_preproc_helpers.data_preproc_functions        import load_preproc_data_adult, load_preproc_data_german, load_preproc_data_compas
+from aiflearn.algorithms.preprocessing.optim_preproc_helpers.data_preproc_functions \
+    import load_preproc_data_adult, load_preproc_data_german, load_preproc_data_compas
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import accuracy_score
+
 
 from IPython.display import Markdown, display
 import matplotlib.pyplot as plt
