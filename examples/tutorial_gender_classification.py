@@ -1,28 +1,22 @@
-#!/usr/bin/env python
-# coding: utf-8
+"""
 
-# # Bias in Image based Automatic Gender Classification
+Bias in Image based Automatic Gender Classification
 
-# ## Overview
+Overview
 
-# Recent studies have shown that the machine learning models for gender classification task from face images perform differently across groups defined by skin tone. In this tutorial, we will demonstrate the use of the aiflearn toolbox to study the the differential performance of a custom classifier. We use a bias mitigiating algorithm available in aiflearn with the aim of improving a classfication model in terms of the fairness metrics. We will work with the UTK dataset for this tutorial. This can be downloaded from here:
-# https://susanqq.github.io/UTKFace/
-# 
-# In a nutshell, we will follow these steps:
-#  - Process images and load them as a aiflearn dataset
-#  - Learn a baseline classifier and obtain fairness metrics
-#  - Call the `Reweighing` algorithm to obtain obtain instance weights
-#  - Learn a new classifier with the instance weights and obtain updated fairness metrics
+Recent studies have shown that the machine learning models for gender
+classification task from face images perform differently across groups defined by skin tone. In this tutorial, we will demonstrate the use of the aiflearn toolbox to study the the differential performance of a custom classifier. We use a bias mitigiating algorithm available in aiflearn with the aim of improving a classfication model in terms of the fairness metrics. We will work with the UTK dataset for this tutorial. This can be downloaded from here:
+https://susanqq.github.io/UTKFace/
 
-# ### Call the import statements
-
-# In[1]:
+ In a nutshell, we will follow these steps:
+  - Process images and load them as a aiflearn dataset
+  - Learn a baseline classifier and obtain fairness metrics
+  - Call the `Reweighing` algorithm to obtain obtain instance weights
+  - Learn a new classifier with the instance weights and obtain updated fairness metrics
+"""
+# Call the import statements
 
 
-get_ipython().run_line_magic('matplotlib', 'inline')
-
-
-# In[2]:
 
 
 import glob
@@ -56,17 +50,27 @@ torch.manual_seed(99)
 
 
 # # Step 1: Load and Process Images
-# The first step is to to download the images `Aligned&cropped` images at this location mentioned above.
+# The first step is to to download the images `Aligned&cropped` images at this
+# location mentioned above.
 # 
-# After unzipping the downloaded file, point the location of the folder in the `image_dir` variable below. 
-# The file name has the following format `age`-`gender`-`race`-`date&time`.jpg
+# After unzipping the downloaded file, point the location of the folder in the
+# `image_dir` variable below. The file name has the following format
+# `age`-`gender`-`race`-`date&time`.jpg
 # 
 #     age: indicates the age of the person in the picture and can range from 0 to 116.
 #     gender: indicates the gender of the person and is either 0 (male) or 1 (female).
-#     race: indicates the race of the person and can from 0 to 4, denoting White, Black, Asian, Indian, and Others (like Hispanic, Latino, Middle Eastern).
+#     race: indicates the race of the person and can from 0 to 4, denoting White,
+#     Black, Asian, Indian, and Others (like Hispanic, Latino, Middle Eastern).
 #     date&time: indicates the date and time an image was collected in the UTK dataset.
 # 
-# For this tutorial we will restict the images to contrain `White` and `Others` races. We need to specify the unprivileged and previledged groups to obtain various metrics from the aiflearn toolbox. We set `White` as the previledged group and `Others` as the unpreviledged group for computing the results with gender as the outcome variable that need to be predicted. We set prediction as `female (1)` as the unfavorable label and `male (0)` as favorable label for the purpose of computing metrics and does not have any special meaning in the context of gender prediction.
+# For this tutorial we will restict the images to contrain `White` and `Others`
+# races. We need to specify the unprivileged and previledged groups to obtain
+# various metrics from the aiflearn toolbox. We set `White` as the previledged
+# group and `Others` as the unpreviledged group for computing the results with
+# gender as the outcome variable that need to be predicted. We set prediction
+# as `female (1)` as the unfavorable label and `male (0)` as favorable label
+# for the purpose of computing metrics and does not have any special meaning
+# in the context of gender prediction.
 
 # In[4]:
 
@@ -78,8 +82,10 @@ favorable_label = 0.0
 unfavorable_label = 1.0
 
 
-# ### Update the `image_dir` with the downloaded and extracted images location and specify the desired image size.
-# The images and loaded and resized usign opencv library. The following code creates three key numpy arrays each containing the raw images, the race attributes and the gender labels.
+# ### Update the `image_dir` with the downloaded and extracted images location
+# and specify the desired image size. The images and loaded and resized usign
+# opencv library. The following code creates three key numpy arrays each
+# containing the raw images, the race attributes and the gender labels.
 
 # In[5]:
 
@@ -195,7 +201,8 @@ test_loader = torch.utils.data.DataLoader(test, batch_size=batch_size, shuffle=F
 
 
 # ## Create a Plain Model
-# In the next few steps, we will create and intialize a model with the above described architecture and train it.
+# In the next few steps, we will create and intialize a model with the above
+# described architecture and train it.
 
 # In[11]:
 
@@ -206,7 +213,10 @@ summary(model, (3,img_size,img_size))
 
 
 # ## Training the network
-# Next,  we will train the model summarized above. `num_epochs` specifies the number of epochs used for  training. The learning rate is set to $0.001$. We will use the `Adam` otimizer to minimze the standard cross-entropy loss for classification tasks.
+# Next,  we will train the model summarized above. `num_epochs` specifies the
+# number of epochs used for  training. The learning rate is set to $0.001$.
+# We will use the `Adam` otimizer to minimze the standard cross-entropy loss
+# for classification tasks.
 
 # In[12]:
 
@@ -234,11 +244,13 @@ for epoch in range(num_epochs):
         optimizer.step()
         
         if (idx+1) % print_freq == 0:
-            print ('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}' .format(epoch+1, num_epochs, idx+1, num_batches, loss.item()))
+            print ('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}' .format(epoch+1,
+                     num_epochs, idx+1, num_batches, loss.item()))
 
 
-# #### Measure Fairness Metrics
-# Let's get the predictions of this trained model on the test and use them to compute various fariness metrics available in the aiflearn toolbox. 
+# # Measure Fairness Metrics
+# Let's get the predictions of this trained model on the test and use them to
+# compute various fariness metrics available in the aiflearn toolbox.
 
 # In[13]:
 
@@ -256,14 +268,20 @@ with torch.no_grad():
 y_pred = np.array(y_pred)
 
 
-# The wrapper function defined below can be used to convert the numpy arrays and the related meta data into a aiflearn dataset. This will ease the process of computing metrics and comparing two datasets. The wrapper consumes the outcome array, the protected attribute array, information about unprivileged_groups and privileged_groups; and the favorable and unfavorable label to produce an instance of aiflearn's `BinaryLabelDataset`.
+# The wrapper function defined below can be used to convert the numpy
+# arrays and the related meta data into a aiflearn dataset. This will ease the
+# process of computing metrics and comparing two datasets. The wrapper consumes
+# the outcome array, the protected attribute array, information about
+# unprivileged_groups and privileged_groups; and the favorable and unfavorable
+# label to produce an instance of aiflearn's `BinaryLabelDataset`.
 
 # In[14]:
 
 
 def dataset_wrapper(outcome, protected, unprivileged_groups, privileged_groups,
                           favorable_label, unfavorable_label):
-    """ A wraper function to create aiflearn dataset from outcome and protected in numpy array format.
+    """ A wraper function to create aiflearn dataset from outcome and protected
+    in numpy array format.
     """
     df = pd.DataFrame(data=outcome,
                       columns=['outcome'])
@@ -299,7 +317,11 @@ plain_predictions_test_dataset = dataset_wrapper(outcome=y_pred, protected=p_tes
 
 
 # #### Obtaining the Classification Metrics
-# We use the `ClassificationMetric` class from the aiflearn toolbox for computing metrics based on two BinaryLabelDatasets. The first dataset is the original one and the second is the output of the classification transformer (or similar). Later on we will use `BinaryLabelDatasetMetric` which computes based on a single `BinaryLabelDataset`.
+# We use the `ClassificationMetric` class from the aiflearn toolbox for
+# computing metrics based on two BinaryLabelDatasets. The first dataset is the
+# original one and the second is the output of the classification transformer
+# (or similar). Later on we will use `BinaryLabelDatasetMetric` which computes
+# based on a single `BinaryLabelDataset`.
 
 # In[16]:
 
@@ -328,10 +350,15 @@ print("Test set: False negative rate difference = %f" % classified_metric_nodebi
 
 
 # # Step 3: Apply the Reweighing algorithm to tranform the dataset
-# Reweighing is a preprocessing technique that weights the examples in each (group, label) combination differently to ensure fairness before classification [1]. This is one of the very few pre-processing method we are aware of that could tractably be applied to multimedia data (since it does not work with the features).
+# Reweighing is a preprocessing technique that weights the examples in each
+# (group, label) combination differently to ensure fairness before classification
+# [1]. This is one of the very few pre-processing method we are aware of that
+# could tractably be applied to multimedia data (since it does not work with
+# the features).
 # 
 #     References:
-#     [1] F. Kamiran and T. Calders,"Data Preprocessing Techniques for Classification without Discrimination," Knowledge and Information Systems, 2012.
+#     [1] F. Kamiran and T. Calders,"Data Preprocessing Techniques for
+#     Classification without Discrimination," Knowledge and Information Systems, 2012.
 
 # In[18]:
 
@@ -353,16 +380,12 @@ metric_tranf_train = BinaryLabelDatasetMetric(transf_traning_dataset,
                                              privileged_groups=privileged_groups)
 
 
-# In[20]:
 
-
-display(Markdown("#### Original training dataset"))
+# Original training dataset
 print("Difference in mean outcomes between privileged and unprivileged groups = %f" % metric_orig_train.mean_difference())
-display(Markdown("#### Transformed training dataset"))
+# Transformed training dataset
 print("Difference in mean outcomes between privileged and unprivileged groups = %f" % metric_tranf_train.mean_difference())
 
-
-# In[21]:
 
 
 metric_orig_test = BinaryLabelDatasetMetric(original_test_dataset, 
@@ -372,14 +395,21 @@ transf_test_dataset = RW.transform(original_test_dataset)
 metric_transf_test = BinaryLabelDatasetMetric(transf_test_dataset, 
                                              unprivileged_groups=unprivileged_groups,
                                              privileged_groups=privileged_groups)
-display(Markdown("#### Original testing dataset"))
-print("Difference in mean outcomes between privileged and unprivileged groups = %f" % metric_orig_test.mean_difference())
-display(Markdown("#### Transformed testing dataset"))
-print("Difference in mean outcomes between privileged and unprivileged groups = %f" % metric_transf_test.mean_difference())
+# Original testing dataset
+print("Difference in mean outcomes between privileged and unprivileged groups = %f"
+      % metric_orig_test.mean_difference())
+# Transformed testing dataset
+print("Difference in mean outcomes between privileged and unprivileged groups = %f"
+      % metric_transf_test.mean_difference())
 
 
 # # Step 4: Learn a New Classfier using the Instance Weights
-# We can see that the reweighing was able to reduce the difference in mean outcomes between privileged and unprivileged groups. This was done by learning appropriate weights for each training instance. In the current step, we will use these learned instance weights to train a network. We  will create coustom pytorch loss called `InstanceWeighetedCrossEntropyLoss` that uses the instances weights to produce the loss value for a batch of data samples.
+# We can see that the reweighing was able to reduce the difference in mean
+# outcomes between privileged and unprivileged groups. This was done by
+# learning appropriate weights for each training instance. In the current step,
+# we will use these learned instance weights to train a network. We  will create
+# coustom pytorch loss called `InstanceWeighetedCrossEntropyLoss` that uses the
+# instances weights to produce the loss value for a batch of data samples.
 
 # In[27]:
 
@@ -452,7 +482,8 @@ for epoch in range(num_epochs):
         optimizer.step()
         
         if (idx+1) % print_freq == 0:
-            print ('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}' .format(epoch+1, num_epochs, idx+1, num_batches, loss.item()))
+            print ('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}' .format(epoch+1,
+                    num_epochs, idx+1, num_batches, loss.item()))
 
 
 # In[32]:
@@ -471,7 +502,8 @@ with torch.no_grad():
 y_pred_transf = np.array(y_pred_transf)
 
 
-# Let us repeat the same steps as before to convert the predictions into aiflearn dataset and obtain various metrics.
+# Let us repeat the same steps as before to convert the predictions into
+# aiflearn dataset and obtain various metrics.
 
 # In[33]:
 
@@ -520,9 +552,13 @@ print("Test set: Theil_index = %f" % classified_metric_debiasing_test.theil_inde
 print("Test set: False negative rate difference = %f" % classified_metric_debiasing_test.false_negative_rate_difference())
 
 
-# Let us break down these numbers by age to understand how these bias differs across age groups. For demonstration, we dividee all the samples into these age groups: 0-10, 10-20, 20-40, 40-60 and 60-150. For this we will create aiflearn datasets using the subset of samples that fall into each of the age groups. The plot below shows how the `Equal opportunity difference` metric varies across age groups before and after applying the bias mitigating reweighing algorithm.
-
-# In[36]:
+# Let us break down these numbers by age to understand how these bias differs
+# across age groups. For demonstration, we dividee all the samples into these
+# age groups: 0-10, 10-20, 20-40, 40-60 and 60-150. For this we will create
+# aiflearn datasets using the subset of samples that fall into each of the age
+# groups. The plot below shows how the `Equal opportunity difference` metric
+# varies across age groups before and after applying the bias mitigating
+# reweighing algorithm.
 
 
 # Metrics sliced by age
@@ -579,7 +615,16 @@ plt.show()
 
 
 # # Conclusions
-# In this tutorial, we have examined fairness in the scenario of binary classification with face images. We discussed methods to process several attributes of images, outcome variables, and protected attributes and create aiflearn ready dataset objects on which many bias mititation algorithms can be easily applied and fairness metrics can be easliy computed. We used the reweighing algorithm with the aim of improving the algorithmic fairness of the learned classifiers. The empirical results show slight improvement in the case of debiased model over the vanilla model. When sliced by age group, the results appear to be mixed bag and thus has scope for further improvements by considering age group while learning models. 
+# In this tutorial, we have examined fairness in the scenario of binary
+# classification with face images. We discussed methods to process several
+# attributes of images, outcome variables, and protected attributes and create
+# aiflearn ready dataset objects on which many bias mititation algorithms can
+# be easily applied and fairness metrics can be easliy computed. We used the
+# reweighing algorithm with the aim of improving the algorithmic fairness of
+# the learned classifiers. The empirical results show slight improvement in
+# the case of debiased model over the vanilla model. When sliced by age group,
+# the results appear to be mixed bag and thus has scope for further improvements
+# by considering age group while learning models.
 
 # In[ ]:
 
@@ -587,7 +632,6 @@ plt.show()
 
 
 
-# In[ ]:
 
 
 
