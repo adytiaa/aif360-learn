@@ -3,9 +3,7 @@ This notebook demonstrates the use of an odds-equalizing post-processing
 algorithm for bias mitigiation.
 
 """
-
-# 
-
+ 
 
 # Load all necessary packages
 import sys
@@ -24,9 +22,6 @@ from IPython.display import Markdown, display
 import matplotlib.pyplot as plt
 
 # Fairness metrics for original dataset
-
-# In[2]:
-
 
 ## import dataset
 dataset_used = "adult"  # "adult", "german", "compas"
@@ -70,17 +65,12 @@ randseed = 12345679
 
 # #### Divide dataset into train, validation, and test partitions (70-30)
 
-# In[3]:
-
 
 dataset_orig_train, dataset_orig_vt = dataset_orig.split([0.6], shuffle=True)
 dataset_orig_valid, dataset_orig_test = dataset_orig_vt.split([0.5],
                                                               shuffle=True)
 
 # #### Training data characteristics
-
-# In[4]:
-
 
 # print out some labels, names, etc.
 #### Dataset shape
@@ -96,8 +86,6 @@ display(Markdown("#### Dataset feature names"))
 print(dataset_orig_train.feature_names)
 
 # #### Metric for the original datasets (without any classifiers)
-
-# In[5]:
 
 
 metric_orig_train = BinaryLabelDatasetMetric(dataset_orig_train,
@@ -126,7 +114,6 @@ print(
 
 # ### Train classifier (logistic regression on original training data)
 
-# In[6]:
 
 
 from sklearn.linear_model import LogisticRegression
@@ -186,8 +173,6 @@ dataset_orig_test_pred.labels = y_test_pred
 
 # #### Results before post-processing
 
-# In[7]:
-
 
 cm_pred_train = ClassificationMetric(dataset_orig_train,
                                      dataset_orig_train_pred,
@@ -220,7 +205,6 @@ print(cm_pred_test.difference(cm_pred_test.generalized_false_negative_rate))
 
 # ### Perform odds equalizing post processing on scores
 
-# In[8]:
 
 
 # Odds equalizing post-processing algorithm
@@ -237,15 +221,11 @@ cpp = cpp.fit(dataset_orig_valid, dataset_orig_valid_pred)
 
 # ### Transform validation and test data using the post processing algorithm
 
-# In[9]:
-
 
 dataset_transf_valid_pred = cpp.predict(dataset_orig_valid_pred)
 dataset_transf_test_pred = cpp.predict(dataset_orig_test_pred)
 
 # #### Results after post-processing
-
-# In[10]:
 
 
 cm_transf_valid = ClassificationMetric(dataset_orig_valid,
@@ -270,7 +250,6 @@ print(cm_transf_test.difference(cm_transf_test.generalized_false_positive_rate))
 print("Difference in GFNR between unprivileged and privileged groups")
 print(cm_transf_test.difference(cm_transf_test.generalized_false_negative_rate))
 
-# In[11]:
 
 
 # Testing: Check if the rates for validation data has gone down
@@ -278,12 +257,17 @@ assert np.abs(cm_transf_valid.difference(
     cm_transf_valid.generalized_false_negative_rate)) < np.abs(
     cm_pred_valid.difference(cm_pred_valid.generalized_false_negative_rate))
 
-# In[12]:
+
 
 
 # Thresholds
 all_thresh = np.linspace(0.01, 0.99, 25)
+<<<<<<< HEAD
 # Classification thresholds used for validation and parameter selection
+=======
+display(Markdown(
+    "#### Classification thresholds used for validation and parameter selection"))
+>>>>>>> f4b2a7a2adcfaa7736e6e214e1542ff1dc65771b
 
 bef_avg_odds_diff_test = []
 bef_avg_odds_diff_valid = []
@@ -304,38 +288,62 @@ for thresh in tqdm(all_thresh):
     # Labels for the datasets from scores
     y_temp = np.zeros_like(dataset_orig_valid_pred_thresh.labels)
     y_temp[
+<<<<<<< HEAD
         dataset_orig_valid_pred_thresh.scores >= thresh] =\
         dataset_orig_valid_pred_thresh.favorable_label
     y_temp[~(
                 dataset_orig_valid_pred_thresh.scores >= thresh)] = \
         dataset_orig_valid_pred_thresh.unfavorable_label
+=======
+        dataset_orig_valid_pred_thresh.scores >= thresh] = dataset_orig_valid_pred_thresh.favorable_label
+    y_temp[~(
+                dataset_orig_valid_pred_thresh.scores >= thresh)] = dataset_orig_valid_pred_thresh.unfavorable_label
+>>>>>>> f4b2a7a2adcfaa7736e6e214e1542ff1dc65771b
     dataset_orig_valid_pred_thresh.labels = y_temp
 
     y_temp = np.zeros_like(dataset_orig_test_pred_thresh.labels)
     y_temp[
+<<<<<<< HEAD
         dataset_orig_test_pred_thresh.scores >= thresh] = \
         dataset_orig_test_pred_thresh.favorable_label
     y_temp[~(
                 dataset_orig_test_pred_thresh.scores >= thresh)] = \
         dataset_orig_test_pred_thresh.unfavorable_label
+=======
+        dataset_orig_test_pred_thresh.scores >= thresh] = dataset_orig_test_pred_thresh.favorable_label
+    y_temp[~(
+                dataset_orig_test_pred_thresh.scores >= thresh)] = dataset_orig_test_pred_thresh.unfavorable_label
+>>>>>>> f4b2a7a2adcfaa7736e6e214e1542ff1dc65771b
     dataset_orig_test_pred_thresh.labels = y_temp
 
     y_temp = np.zeros_like(dataset_transf_valid_pred_thresh.labels)
     y_temp[
+<<<<<<< HEAD
         dataset_transf_valid_pred_thresh.scores >= thresh] = \
         dataset_transf_valid_pred_thresh.favorable_label
     y_temp[~(
                 dataset_transf_valid_pred_thresh.scores >= thresh)] = \
         dataset_transf_valid_pred_thresh.unfavorable_label
+=======
+        dataset_transf_valid_pred_thresh.scores >= thresh] = dataset_transf_valid_pred_thresh.favorable_label
+    y_temp[~(
+                dataset_transf_valid_pred_thresh.scores >= thresh)] = dataset_transf_valid_pred_thresh.unfavorable_label
+>>>>>>> f4b2a7a2adcfaa7736e6e214e1542ff1dc65771b
     dataset_transf_valid_pred_thresh.labels = y_temp
 
     y_temp = np.zeros_like(dataset_transf_test_pred_thresh.labels)
     y_temp[
+<<<<<<< HEAD
         dataset_transf_test_pred_thresh.scores >= thresh] = \
         dataset_transf_test_pred_thresh.favorable_label
     y_temp[~(
                 dataset_transf_test_pred_thresh.scores >= thresh)] = \
         dataset_transf_test_pred_thresh.unfavorable_label
+=======
+        dataset_transf_test_pred_thresh.scores >= thresh] = dataset_transf_test_pred_thresh.favorable_label
+    y_temp[~(
+                dataset_transf_test_pred_thresh.scores >= thresh)] = dataset_transf_test_pred_thresh.unfavorable_label
+>>>>>>> f4b2a7a2adcfaa7736e6e214e1542ff1dc65771b
     dataset_transf_test_pred_thresh.labels = y_temp
 
     # Metrics for original validation data
@@ -414,7 +422,6 @@ fig.legend(["Balanced Acc. - Orig.", "Balanced Acc. - Postproc.",
             "Equal opp. diff. - Orig.", "Equal opp. diff. - Postproc.", ],
            fontsize=16)
 
-# In[14]:
 
 
 bef_bal_acc_test = np.array(bef_bal_acc_test)
@@ -444,5 +451,3 @@ ax2.grid(True)
 fig.legend(["Balanced Acc. - Orig.", "Balanced Acc. - Postproc.",
             "Equal opp. diff. - Orig.", "Equal opp. diff. - Postproc."],
            fontsize=16)
-
-# In[ ]:

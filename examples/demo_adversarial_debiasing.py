@@ -13,28 +13,20 @@ and without fairness constraints and apply them on the Adult dataset.
 import sys
 
 import tensorflow as tf
-
 from IPython.display import Markdown, display
-from sklearn.linear_model import LosgisticRegression
-from sklearn.metrics import accuracy_score
-from sklearn.preprocessing import MaxAbsScaler, StandardScaler
+from sklearn.preprocessing import MaxAbsScaler
 
 from aiflearn.algorithms.inprocessing.adversarial_debiasing import \
     AdversarialDebiasing
-from aiflearn.algorithms.preprocessing.optim_preproc_helpers.data_preproc_functions\
-    import (load_preproc_data_adult , load_preproc_data_compas, load_preproc_data_german)
-
-from aiflearn.datasets import (AdultDataset, BinaryLabelDataset,
-                               CompasDataset,
-                               GermanDataset)
+from aiflearn.algorithms.preprocessing.optim_preproc_helpers.data_preproc_functions \
+    import (load_preproc_data_adult)
 from aiflearn.metrics import BinaryLabelDatasetMetric, ClassificationMetric
-from aiflearn.metrics.utils import compute_boolean_conditioning_vector
 
 sys.path.append("../")
 
 # Load dataset and set options
 
-# In[2]:
+
 
 # Get the dataset and split into train and test
 dataset_orig = load_preproc_data_adult()
@@ -44,7 +36,6 @@ unprivileged_groups = [{'sex': 0}]
 
 dataset_orig_train, dataset_orig_test = dataset_orig.split([0.7], shuffle=True)
 
-# In[3]:
 
 # print out some labels, names, etc.
 # Training Dataset shape
@@ -60,8 +51,6 @@ display(Markdown("#### Dataset feature names"))
 print(dataset_orig_train.feature_names)
 
 # #### Metric for original training data
-
-# In[4]:
 
 # Metric for the original dataset
 metric_orig_train = BinaryLabelDatasetMetric(
@@ -81,8 +70,6 @@ print(
     "Test set: Difference in mean outcomes between unprivileged and "
     "privileged groups = %f"
     % metric_orig_test.mean_difference())
-
-# In[5]:
 
 min_max_scaler = MaxAbsScaler()
 dataset_orig_train.features = min_max_scaler.fit_transform(
@@ -123,17 +110,13 @@ plain_model = AdversarialDebiasing(
     debias=False,
     sess=sess)
 
-# In[7]:
 
 plain_model.fit(dataset_orig_train)
-
-# In[8]:
 
 # Apply the plain model to test data
 dataset_nodebiasing_train = plain_model.predict(dataset_orig_train)
 dataset_nodebiasing_test = plain_model.predict(dataset_orig_test)
 
-# In[9]:
 
 # Metrics for the dataset from plain model (without debiasing)
 display(Markdown("#### Plain model - without debiasing - dataset metrics"))
@@ -180,15 +163,13 @@ print("Test set: Average odds difference = %f" %
 print("Test set: Theil_index = %f" %
       classified_metric_nodebiasing_test.theil_index())
 
-# ### Apply in-processing algorithm based on adversarial learning
+# Apply in-processing algorithm based on adversarial learning
 
-# In[10]:
 
 sess.close()
 tf.reset_default_graph()
 sess = tf.Session()
 
-# In[11]:
 
 # Learn parameters with debias set to True
 debiased_model = AdversarialDebiasing(
@@ -198,17 +179,14 @@ debiased_model = AdversarialDebiasing(
     debias=True,
     sess=sess)
 
-# In[12]:
 
 debiased_model.fit(dataset_orig_train)
 
-# In[13]:
 
 # Apply the plain model to test data
 dataset_debiasing_train = debiased_model.predict(dataset_orig_train)
 dataset_debiasing_test = debiased_model.predict(dataset_orig_test)
 
-# In[14]:
 
 # Metrics for the dataset from plain model (without debiasing)
 # Plain model - without debiasing - dataset metrics
@@ -288,4 +266,4 @@ print("Test set: Theil_index = %f" %
 #     with Adversarial Learning,"
 #     AAAI/ACM Conference on Artificial Intelligence, Ethics, and Society, 2018.
 
-# In[ ]:
+

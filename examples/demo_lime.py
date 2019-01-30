@@ -9,24 +9,15 @@ generate explanations for model predictions.
 
 from __future__ import print_function
 
-import sklearn.model_selection
-import sklearn.metrics
-import sklearn.datasets
-import sklearn.ensemble
-import sklearn.preprocessing
-import numpy as np
-import lime
-import lime.lime_tabular
-from IPython.display import Markdown, display
-import matplotlib.pyplot as plt
 import sys
+
+import lime.lime_tabular
+import sklearn.preprocessing
+
 sys.path.append("../")
 import numpy as np
-from aiflearn.datasets import BinaryLabelDataset
 from aiflearn.metrics.binary_label_dataset_metric import BinaryLabelDatasetMetric
 from aiflearn.metrics.classification_metric import ClassificationMetric
-# from aiflearn.algorithms.preprocessing.optim_preproc_helpers.data_preproc_
-# functions import load_preproc_data_adult
 from aiflearn.algorithms.preprocessing.reweighing import Reweighing
 
 
@@ -35,7 +26,6 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score
 
-from IPython.display import Markdown, display
 import matplotlib.pyplot as plt
 
 from aiflearn.datasets.lime_encoder import LimeEncoder 
@@ -234,7 +224,6 @@ explainer = lime.lime_tabular.LimeTabularExplainer(s_train ,class_names=limeData
 
 s_predict_fn = lambda x: model.predict_proba(scale.transform(limeData.inverse_transform(x)))
 
-import random
 print("Threshold corresponding to Best balance accuracy: %6.4f" % rf_thresh_arr_orig_best)
 i1 = 1
 exp = explainer.explain_instance(s_test[i1], s_predict_fn, num_features=5)

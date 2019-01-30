@@ -3,7 +3,6 @@ This notebook demonstrates the use of a reweighing pre-processing
 algorithm for bias mitigation.
 """
 
-# In[1]:
 
 # Load all necessary packages
 import sys
@@ -11,8 +10,6 @@ sys.path.append("../")
 import numpy as np
 from tqdm import tqdm
 
-from aiflearn.datasets import BinaryLabelDataset
-from aiflearn.datasets import AdultDataset, GermanDataset, CompasDataset
 from aiflearn.metrics import BinaryLabelDatasetMetric
 from aiflearn.metrics import ClassificationMetric
 from aiflearn.algorithms.preprocessing.reweighing import Reweighing
@@ -30,12 +27,10 @@ from common_utils import compute_metrics
 
 # #### Load dataset and set options
 
-# In[2]:
-
 
 ## import dataset
-dataset_used = "adult" # "adult", "german", "compas"
-protected_attribute_used = 1 # 1, 2
+dataset_used = "adult"  # "adult", "german", "compas"
+protected_attribute_used = 1  # 1, 2
 
 
 if dataset_used == "adult":
@@ -300,13 +295,13 @@ ax2.yaxis.set_tick_params(labelsize=14)
 ax2.grid(True)
 
 
-# ```average odds difference = 0.5((FPR_unpriv-FPR_priv)+(TPR_unpriv-TPR_priv))``` must be close to zero for the classifier to be fair.
+# ```average odds difference = 0.5((FPR_unpriv-FPR_priv)+(TPR_unpriv-TPR_priv))```
+# must be close to zero for the classifier to be fair.
 # 
-# However, for a classifier trained with original training data, at the best classification rate, this is quite high. This implies unfairness.
+# However, for a classifier trained with original training data, at the best
+# classification rate, this is quite high. This implies unfairness.
 
 # ### Train classifier on transformed data
-
-# In[16]:
 
 
 scale_transf = StandardScaler()

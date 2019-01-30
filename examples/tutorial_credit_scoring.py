@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
 # # Detecting and mitigating age bias on credit decisions 
 # 
 # The goal of this tutorial is to introduce the basic functionality of AI Fairness 360 to an interested developer who may not have a background in bias detection and mitigation.
@@ -49,10 +46,7 @@
 # ### Step 1 Import Statements
 # As with any python program, the first step will be to import the necessary packages.  Below we import several components from the aiflearn package.  We import the GermanDataset, metrics to check for bias, and classes related to the algorithm we will use to mitigate bias. We also import some other non-aiflearn useful packages.
 
-# In[1]:
 
-
-# %matplotlib inline
 # Load all necessary packages
 import sys
 sys.path.append("../")  
@@ -75,7 +69,6 @@ from IPython.display import Markdown, display
 # ### Step 2 Load dataset, specifying protected attribute, and split dataset into train and test
 # In Step 2 we load the initial dataset, setting the protected attribute to be age.  We then splits the original dataset into training and testing datasets.  Although we will use only  the training dataset in this tutorial, a normal workflow would also use a test dataset for assessing the efficacy (accuracy, fairness, etc.) during the development of a machine learning model.  Finally, we set two variables (to be used in Step 3) for the privileged (1) and unprivileged (0) values for the age attribute.  These are key inputs for detecting and mitigating bias, which will be Step 3 and Step 4.  
 
-# In[2]:
 
 
 dataset_orig = load_preproc_data_german(['age'])
@@ -89,7 +82,7 @@ unprivileged_groups = [{'age': 0}]
 # ### Step 3 Compute fairness metric on original training dataset
 # Now that we've identified the protected attribute 'age' and defined privileged and unprivileged values, we can use aiflearn to detect bias in the dataset.  One simple test is to compare the percentage of favorable results for the privileged and unprivileged groups, subtracting the former percentage from the latter.   A negative value indicates less favorable outcomes for the unprivileged groups.  This is implemented in the method called mean_difference on the BinaryLabelDatasetMetric class.  The code below performs this check and displays the output, showing that the difference is -0.121023
 
-# In[3]:
+
 
 
 metric_orig_train = BinaryLabelDatasetMetric(dataset_orig_train, 
@@ -110,7 +103,7 @@ print("Difference in mean outcomes between unprivileged and privileged groups = 
 # 
 # [1] Optimized Pre-Processing for Discrimination Prevention, NIPS 2017, Flavio Calmon, Dennis Wei, Bhanukiran Vinzamuri, Karthikeyan Natesan Ramamurthy, and Kush R. Varshney
 
-# In[4]:
+
 
 
 optim_options = {
@@ -133,7 +126,7 @@ dataset_transf_train = dataset_orig_train.align_datasets(dataset_transf_train)
 # ### Step 5 Compute fairness metric on transformed dataset
 # Now that we have a transformed dataset, we can check how effective it was in removing bias by using the same metric we used for the original training dataset in Step 3.  Once again, we use the function mean_difference in the BinaryLabelDatasetMetric class.   We see the mitigation step was very effective, the difference in mean outcomes is now 0.018250.  So we went from a 12% advantage for the privileged group to a 1.8% advantage for the unprivileged group 
 
-# In[5]:
+
 
 
 metric_transf_train = BinaryLabelDatasetMetric(dataset_transf_train, 
@@ -150,7 +143,7 @@ print("Difference in mean outcomes between unprivileged and privileged groups = 
 # 
 # As mentioned earlier, both fairness metrics and mitigation algorithms can be performed at various stages of the machine learning pipeline.  We recommend checking for bias as often as possible, using as many metrics are relevant for the application domain.  We also recommend incorporating bias detection in an automated continouus integration pipeline to ensure bias awareness as a software project evolves.
 
-# In[ ]:
+
 
 
 

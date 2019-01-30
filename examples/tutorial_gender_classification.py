@@ -5,7 +5,12 @@ Bias in Image based Automatic Gender Classification
 Overview
 
 Recent studies have shown that the machine learning models for gender
-classification task from face images perform differently across groups defined by skin tone. In this tutorial, we will demonstrate the use of the aiflearn toolbox to study the the differential performance of a custom classifier. We use a bias mitigiating algorithm available in aiflearn with the aim of improving a classfication model in terms of the fairness metrics. We will work with the UTK dataset for this tutorial. This can be downloaded from here:
+classification task from face images perform differently across groups defined 
+by skin tone. In this tutorial, we will demonstrate the use of the aiflearn 
+toolbox to study the the differential performance of a custom classifier.
+ We use a bias mitigiating algorithm available in aiflearn with the aim of 
+ improving a classfication model in terms of the fairness metrics. We will 
+ work with the UTK dataset for this tutorial. This can be downloaded from here:
 https://susanqq.github.io/UTKFace/
 
  In a nutshell, we will follow these steps:
@@ -72,8 +77,6 @@ torch.manual_seed(99)
 # for the purpose of computing metrics and does not have any special meaning
 # in the context of gender prediction.
 
-# In[4]:
-
 
 races_to_consider = [0,4]
 unprivileged_groups = [{'race': 4.0}]
@@ -127,8 +130,6 @@ age_mat = np.array(feature_age)
 # Lets build a simple convolutional neural network (CNN) with $3$ convolutional layers and $2$ fully connected layers using the `pytorch` framework. 
 # ![CNN](images/cnn_arch.png)
 # Each convolutional layer is followed by a maxpool layer. The final layer provides the logits for the binary gender predicition task.
-
-# In[8]:
 
 
 class ThreeLayerCNN(torch.nn.Module):
@@ -338,7 +339,7 @@ bal_acc_nodebiasing_test = 0.5*(TPR+TNR)
 # In[17]:
 
 
-display(Markdown("#### Plain model - without debiasing - classification metrics"))
+# Plain model - without debiasing - classification metrics
 print("Test set: Classification accuracy = %f" % classified_metric_nodebiasing_test.accuracy())
 print("Test set: Balanced classification accuracy = %f" % bal_acc_nodebiasing_test)
 print("Test set: Statistical parity difference = %f" % classified_metric_nodebiasing_test.statistical_parity_difference())
@@ -411,7 +412,6 @@ print("Difference in mean outcomes between privileged and unprivileged groups = 
 # coustom pytorch loss called `InstanceWeighetedCrossEntropyLoss` that uses the
 # instances weights to produce the loss value for a batch of data samples.
 
-# In[27]:
 
 
 tranf_train = torch.utils.data.TensorDataset(Variable(torch.FloatTensor(X_train.astype('float32'))),
@@ -516,8 +516,6 @@ transf_predictions_test_dataset = dataset_wrapper(outcome=y_pred_transf, protect
                                                  )
 
 
-# In[34]:
-
 
 classified_metric_debiasing_test = ClassificationMetric(original_test_dataset, 
                                                  transf_predictions_test_dataset,
@@ -528,10 +526,9 @@ TNR = classified_metric_debiasing_test.true_negative_rate()
 bal_acc_debiasing_test = 0.5*(TPR+TNR)
 
 
-# In[35]:
 
 
-display(Markdown("#### Plain model - without debiasing - classification metrics"))
+# Plain model - without debiasing - classification metrics
 print("Test set: Classification accuracy = %f" % classified_metric_nodebiasing_test.accuracy())
 print("Test set: Balanced classification accuracy = %f" % bal_acc_nodebiasing_test)
 print("Test set: Statistical parity difference = %f" % classified_metric_nodebiasing_test.statistical_parity_difference())
@@ -541,7 +538,7 @@ print("Test set: Average odds difference = %f" % classified_metric_nodebiasing_t
 print("Test set: Theil_index = %f" % classified_metric_nodebiasing_test.theil_index())
 print("Test set: False negative rate difference = %f" % classified_metric_nodebiasing_test.false_negative_rate_difference())
 
-display(Markdown("#### Model - with debiasing - classification metrics"))
+# Model - with debiasing - classification metrics
 print("Test set: Classification accuracy = %f" % classified_metric_debiasing_test.accuracy())
 print("Test set: Balanced classification accuracy = %f" % bal_acc_debiasing_test)
 print("Test set: Statistical parity difference = %f" % classified_metric_debiasing_test.statistical_parity_difference())

@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[29]:
-
 
 get_ipython().run_line_magic('load_ext', 'autoreload')
 get_ipython().run_line_magic('autoreload', '2')
@@ -28,7 +26,6 @@ import numpy as np
 import pandas as pd
 
 
-# In[30]:
 
 
 display(Markdown("### Meta-Algorithm for fair classification."))
@@ -39,8 +36,6 @@ display(Markdown("#### -----------------------------"))
 display(Markdown("The example below considers the case of False Discovery Parity."))
 
 
-# In[31]:
-
 
 dataset_orig = load_preproc_data_adult()
 
@@ -50,7 +45,6 @@ unprivileged_groups = [{'sex': 0}]
 dataset_orig_train, dataset_orig_test = dataset_orig.split([0.7], shuffle=True)
 
 
-# In[32]:
 
 
 display(Markdown("#### Training Dataset shape"))
@@ -66,7 +60,6 @@ display(Markdown("#### Dataset feature names"))
 print(dataset_orig_train.feature_names)
 
 
-# In[33]:
 
 
 display(Markdown("#### Training Dataset shape"))
@@ -82,13 +75,12 @@ display(Markdown("#### Dataset feature names"))
 print(dataset_orig_train.feature_names)
 
 
-# In[34]:
 
 
 metric_orig_train = BinaryLabelDatasetMetric(dataset_orig_train, 
                                              unprivileged_groups=unprivileged_groups,
                                              privileged_groups=privileged_groups)
-#display(Markdown("#### Original training dataset"))
+display(Markdown("#### Original training dataset"))
 print("Train set: Difference in mean outcomes between unprivileged and privileged groups = %f" % metric_orig_train.mean_difference())
 metric_orig_test = BinaryLabelDatasetMetric(dataset_orig_test, 
                                              unprivileged_groups=unprivileged_groups,
@@ -104,7 +96,7 @@ dataset_orig_test.features = min_max_scaler.transform(dataset_orig_test.features
 metric_scaled_train = BinaryLabelDatasetMetric(dataset_orig_train, 
                              unprivileged_groups=unprivileged_groups,
                              privileged_groups=privileged_groups)
-#display(Markdown("#### Scaled dataset - Verify that the scaling does not affect the group label statistics"))
+display(Markdown("#### Scaled dataset - Verify that the scaling does not affect the group label statistics"))
 print("Train set: Difference in mean outcomes between unprivileged and privileged groups = %f" % metric_scaled_train.mean_difference())
 metric_scaled_test = BinaryLabelDatasetMetric(dataset_orig_test, 
                              unprivileged_groups=unprivileged_groups,
@@ -112,15 +104,10 @@ metric_scaled_test = BinaryLabelDatasetMetric(dataset_orig_test,
 print("Test set: Difference in mean outcomes between unprivileged and privileged groups = %f" % metric_scaled_test.mean_difference())
 
 
-# In[35]:
-
-
 # Get classifier without fairness constraints
 biased_model = MetaFairClassifier(tau=0, sensitive_attr="sex")
 biased_model.fit(dataset_orig_train)
 
-
-# In[36]:
 
 
 # Apply the unconstrained model to test data
@@ -134,8 +121,6 @@ acc, sr, unconstrainedFDR = getStats(y_test, predictions, x_control_test)
 print(unconstrainedFDR)
 
 
-# In[37]:
-
 
 # Learn debiased classifier
 tau = 0.8
@@ -143,15 +128,10 @@ debiased_model = MetaFairClassifier(tau=tau, sensitive_attr="sex")
 debiased_model.fit(dataset_orig_train)
 
 
-# In[38]:
-
 
 # Apply the debiased model to test data
 dataset_debiasing_train = debiased_model.predict(dataset_orig_train)
 dataset_debiasing_test = debiased_model.predict(dataset_orig_test)
-
-
-# In[39]:
 
 
 # Metrics for the dataset from model with debiasing
@@ -168,8 +148,6 @@ metric_dataset_debiasing_test = BinaryLabelDatasetMetric(dataset_debiasing_test,
 
 print("Test set: Difference in mean outcomes between unprivileged and privileged groups = %f" % metric_dataset_debiasing_test.mean_difference())
 
-
-# In[40]:
 
 
 display(Markdown("#### Model - with debiasing - classification metrics"))
@@ -188,9 +166,6 @@ print("Test set: Average odds difference = %f" % classified_metric_debiasing_tes
 print("Test set: Theil_index = %f" % classified_metric_debiasing_test.theil_index())
 
 
-# In[41]:
-
-
 ### Testing 
 predictions = list(dataset_debiasing_test.labels)
 predictions = [1 if y == dataset_orig_train.favorable_label else -1 for y in predictions]
@@ -201,8 +176,6 @@ acc, sr, fdr = getStats(y_test, predictions, x_control_test)
 print(fdr, unconstrainedFDR)
 assert(fdr >= unconstrainedFDR)
 
-
-# In[ ]:
 
 
 biased_model = MetaFairClassifier(tau=0, sensitive_attr="race")
@@ -217,7 +190,6 @@ x_control_test = pd.DataFrame(data=dataset_orig_test.features, columns=dataset_o
 acc, sr, unconstrainedFDR = getStats(y_test, predictions, x_control_test)
 
 
-# In[10]:
 
 
 display(Markdown("#### Running the algorithm for different tau values"))
@@ -249,9 +221,6 @@ for tau in all_tau:
     
 
 
-# In[11]:
-
-
 display(Markdown("### Plot of accuracy and output fairness vs input constraint (tau)"))
 
 display(Markdown("#### Output fairness is represented by $\gamma_{fdr}$, which is the ratio of false discovery rate of different sensitive attribute values."))
@@ -271,7 +240,6 @@ ax2.yaxis.set_tick_params(labelsize=14)
 ax2.grid(True)
 
 
-# In[ ]:
 
 
 # # 
