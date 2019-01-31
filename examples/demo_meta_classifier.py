@@ -1,10 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-
-get_ipython().run_line_magic('load_ext', 'autoreload')
-get_ipython().run_line_magic('autoreload', '2')
-
 import sys
 sys.path.append("../")
 from aiflearn.datasets import BinaryLabelDataset
@@ -16,7 +9,8 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler, MaxAbsScaler
 from sklearn.metrics import accuracy_score
 
-from aiflearn.algorithms.preprocessing.optim_preproc_helpers.data_preproc_functions import load_preproc_data_adult, load_preproc_data_compas, load_preproc_data_german
+from aiflearn.algorithms.preprocessing.optim_preproc_helpers.data_preproc_functions \
+    import load_preproc_data_adult, load_preproc_data_compas, load_preproc_data_german
 
 from aiflearn.algorithms.inprocessing.meta_fair_classifier import MetaFairClassifier
 from aiflearn.algorithms.inprocessing.celisMeta.utils import getStats
@@ -25,15 +19,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+# Meta-Algorithm for fair classification
+# The fairness metrics to be optimized have to specified as \"input\". Currently
+# we can handle the following fairness metrics namely, Statistical Rate, False
+# Positive Rate, True Positive Rate, False Negative Rate, True Negative Rate
+# Accuracy Rate, False Discovery Rate, False Omission Rate, Positive Predictive Rate, Negative Predictive Rate."))
 
-
-
-display(Markdown("### Meta-Algorithm for fair classification."))
-display(Markdown("The fairness metrics to be optimized have to specified as \"input\". Currently we can handle the following fairness metrics."))
-display(Markdown("Statistical Rate, False Positive Rate, True Positive Rate, False Negative Rate, True Negative Rate,"))
-display(Markdown("Accuracy Rate, False Discovery Rate, False Omission Rate, Positive Predictive Rate, Negative Predictive Rate."))
-display(Markdown("#### -----------------------------"))
-display(Markdown("The example below considers the case of False Discovery Parity."))
+# #### The example below considers the case of False Discovery Parity
 
 
 
@@ -46,32 +38,31 @@ dataset_orig_train, dataset_orig_test = dataset_orig.split([0.7], shuffle=True)
 
 
 
-
-display(Markdown("#### Training Dataset shape"))
-print(dataset_orig_train.features.shape)
-display(Markdown("#### Favorable and unfavorable labels"))
+# Training Dataset shape
+print(dataset_orig_train.features.shape
+# Favorable and unfavorable labels
 print(dataset_orig_train.favorable_label, dataset_orig_train.unfavorable_label)
-display(Markdown("#### Protected attribute names"))
+# Protected attribute names
 print(dataset_orig_train.protected_attribute_names)
-display(Markdown("#### Privileged and unprivileged protected attribute values"))
+# Privileged and unprivileged protected attribute values
 print(dataset_orig_train.privileged_protected_attributes, 
       dataset_orig_train.unprivileged_protected_attributes)
-display(Markdown("#### Dataset feature names"))
+# Dataset feature names
 print(dataset_orig_train.feature_names)
 
 
 
 
-display(Markdown("#### Training Dataset shape"))
+# Training Dataset shape
 print(dataset_orig_train.features.shape)
-display(Markdown("#### Favorable and unfavorable labels"))
+# Favorable and unfavorable labels
 print(dataset_orig_train.favorable_label, dataset_orig_train.unfavorable_label)
-display(Markdown("#### Protected attribute names"))
+# Protected attribute names
 print(dataset_orig_train.protected_attribute_names)
-display(Markdown("#### Privileged and unprivileged protected attribute values"))
+# Privileged and unprivileged protected attribute values
 print(dataset_orig_train.privileged_protected_attributes, 
       dataset_orig_train.unprivileged_protected_attributes)
-display(Markdown("#### Dataset feature names"))
+# Dataset feature names
 print(dataset_orig_train.feature_names)
 
 
@@ -81,11 +72,13 @@ metric_orig_train = BinaryLabelDatasetMetric(dataset_orig_train,
                                              unprivileged_groups=unprivileged_groups,
                                              privileged_groups=privileged_groups)
 display(Markdown("#### Original training dataset"))
-print("Train set: Difference in mean outcomes between unprivileged and privileged groups = %f" % metric_orig_train.mean_difference())
+print("Train set: Difference in mean outcomes between unprivileged and privileged groups = %f"
+      % metric_orig_train.mean_difference())
 metric_orig_test = BinaryLabelDatasetMetric(dataset_orig_test, 
                                              unprivileged_groups=unprivileged_groups,
                                              privileged_groups=privileged_groups)
-print("Test set: Difference in mean outcomes between unprivileged and privileged groups = %f" % metric_orig_test.mean_difference())
+print("Test set: Difference in mean outcomes between unprivileged and privileged groups = %f"
+      % metric_orig_test.mean_difference())
 
 
 
@@ -97,11 +90,13 @@ metric_scaled_train = BinaryLabelDatasetMetric(dataset_orig_train,
                              unprivileged_groups=unprivileged_groups,
                              privileged_groups=privileged_groups)
 display(Markdown("#### Scaled dataset - Verify that the scaling does not affect the group label statistics"))
-print("Train set: Difference in mean outcomes between unprivileged and privileged groups = %f" % metric_scaled_train.mean_difference())
+print("Train set: Difference in mean outcomes between unprivileged and privileged groups = %f"
+      % metric_scaled_train.mean_difference())
 metric_scaled_test = BinaryLabelDatasetMetric(dataset_orig_test, 
                              unprivileged_groups=unprivileged_groups,
                              privileged_groups=privileged_groups)
-print("Test set: Difference in mean outcomes between unprivileged and privileged groups = %f" % metric_scaled_test.mean_difference())
+print("Test set: Difference in mean outcomes between unprivileged and privileged groups = %f"
+      % metric_scaled_test.mean_difference())
 
 
 # Get classifier without fairness constraints
@@ -135,22 +130,24 @@ dataset_debiasing_test = debiased_model.predict(dataset_orig_test)
 
 
 # Metrics for the dataset from model with debiasing
-display(Markdown("#### Model - with debiasing - dataset metrics"))
+# Model - with debiasing - dataset metrics
 metric_dataset_debiasing_train = BinaryLabelDatasetMetric(dataset_debiasing_train, 
                                              unprivileged_groups=unprivileged_groups,
                                              privileged_groups=privileged_groups)
 
-print("Train set: Difference in mean outcomes between unprivileged and privileged groups = %f" % metric_dataset_debiasing_train.mean_difference())
+print("Train set: Difference in mean outcomes between unprivileged and privileged groups = %f"
+      % metric_dataset_debiasing_train.mean_difference())
 
 metric_dataset_debiasing_test = BinaryLabelDatasetMetric(dataset_debiasing_test, 
                                              unprivileged_groups=unprivileged_groups,
                                              privileged_groups=privileged_groups)
 
-print("Test set: Difference in mean outcomes between unprivileged and privileged groups = %f" % metric_dataset_debiasing_test.mean_difference())
+print("Test set: Difference in mean outcomes between unprivileged and privileged groups = %f"
+      % metric_dataset_debiasing_test.mean_difference())
 
 
 
-display(Markdown("#### Model - with debiasing - classification metrics"))
+# Model - with debiasing - classification metrics
 classified_metric_debiasing_test = ClassificationMetric(dataset_orig_test, 
                                                  dataset_debiasing_test,
                                                  unprivileged_groups=unprivileged_groups,
@@ -191,8 +188,7 @@ acc, sr, unconstrainedFDR = getStats(y_test, predictions, x_control_test)
 
 
 
-
-display(Markdown("#### Running the algorithm for different tau values"))
+# Running the algorithm for different tau values
 
 accuracies, false_discovery_rates, statistical_rates = [], [], []
 s_attr = "race"
@@ -221,9 +217,10 @@ for tau in all_tau:
     
 
 
-display(Markdown("### Plot of accuracy and output fairness vs input constraint (tau)"))
+# Plot of accuracy and output fairness vs input constraint (tau)
 
-display(Markdown("#### Output fairness is represented by $\gamma_{fdr}$, which is the ratio of false discovery rate of different sensitive attribute values."))
+# Output fairness is represented by $\gamma_{fdr}$, which is the ratio of
+# false discovery rate of different sensitive attribute values.
 
 fig, ax1 = plt.subplots(figsize=(13,7))
 ax1.plot(all_tau, accuracies, color='r')
@@ -245,5 +242,6 @@ ax2.grid(True)
 # # 
 #     References:
 #         Celis, L. E., Huang, L., Keswani, V., & Vishnoi, N. K. (2018). 
-#         "Classification with Fairness Constraints: A Meta-Algorithm with Provable Guarantees.""
+#         "Classification with Fairness Constraints: A Meta-Algorithm with
+#         Provable Guarantees.""
 

@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-# coding: utf-8
+"""
 
 # # Medical Expenditure Tutorial
 
@@ -111,7 +110,8 @@
 # We assume that the model is initially built and tuned using the 2015 Panel 19 train/test data. (Use case steps a-b.)
 # It is then put into practice and used to score people to identify potential candidates for care management (Use case steps c-e). Initial deployment is simulated to 2015 Panel 20 test/deployment data. To show change in performance and/or fairness over time, (use case steps f-g), the 2016 Panel 21 test/deployment data is used. Finally, if drift is observed, the 2016 train/validation data is used to learn a new model and evaluated again on the 2016 test/deployment data
 
-# In[1]:
+"""
+
 
 
 # Load all necessary packages
@@ -167,7 +167,6 @@ import lime.lime_tabular
 
 # [Back to TOC](#toc)<br>
 
-# In[2]:
 
 
 # Get the dataset and split into train, validate, and test
@@ -185,7 +184,6 @@ sens_attr = dataset_orig_panel19_train.protected_attribute_names[0]
 
 # **Show 2015 dataset details**
 
-# In[3]:
 
 
 # print out some labels, names, etc.
@@ -216,8 +214,6 @@ print(dataset_orig_panel19_train.feature_names)
 
 # #### 3.2.1. Metrics for original data
 
-# In[4]:
-
 
 # Metric for the original dataset
 sens_idx = dataset_orig_panel19_train.protected_attribute_names.index(sens_attr)
@@ -237,8 +233,6 @@ print("Difference in mean outcomes between privileged and unprivileged groups = 
 # <a id="lr-train"></a>
 
 # #### 3.2.2.1. Training LR model from original data
-
-# In[5]:
 
 
 #Train model on given dataset
@@ -265,8 +259,6 @@ lr_scale_orig_panel19 = scale
 # <a id="lr-validate"></a>
 
 # #### 3.2.2.2. Validating LR model from original data
-
-# In[6]:
 
 
 #Validate model on given dataset and find threshold for best balanced accuracy
@@ -330,7 +322,6 @@ eq_opp_diff_at_best_bal_acc = eq_opp_diff[thresh_arr_best_ind]
 theil_ind_at_best_bal_acc = theil_ind[thresh_arr_best_ind]
 
 
-# In[7]:
 
 
 #Plot balanced accuracy, abs(1-disparate impact)
@@ -353,8 +344,6 @@ ax2.yaxis.set_tick_params(labelsize=14)
 ax2.grid(True)
 
 
-# In[8]:
-
 
 #Plot average odds difference
 fig, ax1 = plt.subplots(figsize=(10,7))
@@ -373,8 +362,6 @@ ax2.axvline(np.array(thresh_arr)[thresh_arr_best_ind], color='k', linestyle=':')
 ax2.yaxis.set_tick_params(labelsize=14)
 ax2.grid(True)
 
-
-# In[9]:
 
 
 lr_thresh_arr_orig_panel19_best = thresh_arr_best
@@ -397,7 +384,6 @@ print("Corresponding Theil index value: %6.4f" % lr_theil_ind_at_best_bal_acc_or
 
 # #### 3.2.2.3. Testing LR model from original data
 
-# In[10]:
 
 
 #Evaluate performance of a given model with a given threshold on a given dataset
@@ -448,7 +434,7 @@ eq_opp_diff_at_best_bal_acc = classified_metric.equal_opportunity_difference()
 theil_ind_at_best_bal_acc = classified_metric.theil_index()
 
 
-# In[11]:
+
 
 
 lr_thresh_arr_orig_panel19_best_test = thresh_arr_best
@@ -486,7 +472,7 @@ print("Corresponding Theil index value: %6.4f" % lr_theil_ind_at_best_bal_acc_or
 
 # #### 3.2.3.1. Training RF model from original data
 
-# In[12]:
+
 
 
 #Train model on given dataset
@@ -517,7 +503,7 @@ rf_scale_orig_panel19 = scale
 
 # #### 3.2.3.2. Validating RF model from original data
 
-# In[13]:
+
 
 
 #validate model on given dataset and find threshold for best balanced accuracy
@@ -528,7 +514,7 @@ thresh_arr = np.linspace(0.01, 0.5, 50)
 scale = rf_scale_orig_panel19
 
 model = rf_orig_panel19                  #model to validate
-dataset = dataset_orig_panel19_validate        #data to validate on
+dataset = dataset_orig_panel19_validate  #data to validate on
 
 X_validate = scale.transform(dataset.features)   #apply the same scale as applied to the training data
 y_validate = dataset.labels.ravel()
@@ -580,7 +566,6 @@ eq_opp_diff_at_best_bal_acc = eq_opp_diff[thresh_arr_best_ind]
 theil_ind_at_best_bal_acc = theil_ind[thresh_arr_best_ind]
 
 
-# In[14]:
 
 
 #Plot balanced accuracy, abs(1-disparate impact)
@@ -603,8 +588,6 @@ ax2.yaxis.set_tick_params(labelsize=14)
 ax2.grid(True)
 
 
-# In[15]:
-
 
 #Plot average odds difference
 fig, ax1 = plt.subplots(figsize=(10,7))
@@ -623,8 +606,6 @@ ax2.axvline(np.array(thresh_arr)[thresh_arr_best_ind], color='k', linestyle=':')
 ax2.yaxis.set_tick_params(labelsize=14)
 ax2.grid(True)
 
-
-# In[16]:
 
 
 rf_thresh_arr_orig_panel19_best = thresh_arr_best
@@ -648,7 +629,6 @@ print("Corresponding Theil index value: %6.4f" % rf_theil_ind_at_best_bal_acc_or
 
 # #### 3.2.3.3. Testing RF model from original data
 
-# In[17]:
 
 
 #Evaluate performance of a given model with a given threshold on a given dataset
@@ -657,10 +637,11 @@ scale = rf_scale_orig_panel19
 
 dataset = dataset_orig_panel19_test   #apply model to this data
 model = rf_orig_panel19               #this is the model applied
-                                   #lr_transf_panel19 is LR model learned from Panel panel19 (panel1914)
-                                   #transformed data
-thresh_arr = rf_thresh_arr_orig_panel19_best  # lr_thresh_arr_transf_panel19_best wass threshold for LR
-                                            # model with highest balanced accuracy
+# lr_transf_panel19 is LR model learned from Panel panel19 (panel1914)
+# Transformed data
+thresh_arr = rf_thresh_arr_orig_panel19_best
+# lr_thresh_arr_transf_panel19_best wass threshold for LR model with highest
+# balanced accuracy
 
 
 X_data = scale.transform(dataset.features)
@@ -699,8 +680,6 @@ eq_opp_diff_at_best_bal_acc = classified_metric.equal_opportunity_difference()
 theil_ind_at_best_bal_acc = classified_metric.theil_index()
 
 
-# In[18]:
-
 
 rf_thresh_arr_orig_panel19_best_test = thresh_arr_best
 print("Threshold corresponding to Best balanced accuracy: %6.4f" % rf_thresh_arr_orig_panel19_best_test)
@@ -719,11 +698,15 @@ rf_theil_ind_at_best_bal_acc_orig_panel19_best_test = theil_ind_at_best_bal_acc
 print("Corresponding Theil index value: %6.4f" % rf_theil_ind_at_best_bal_acc_orig_panel19_best_test)
 
 
-# As in the case of the logistic regression classifier learnt from the original data, the fairness metrics for the random forest classifier have values that are quite far from 0.
+# As in the case of the logistic regression classifier learnt from the original
+# data, the fairness metrics for the random forest classifier have values that
+# are quite far from 0.
 # 
-# For example, abs(1-disparate impact) has a value of over 0.5 as opposed to the typical desired value of < 0.2.
+# For example, abs(1-disparate impact) has a value of over 0.5 as opposed to
+# the typical desired value of < 0.2.
 # 
-# This indicates that the random forest classifier learnt from the original data is also unfair.
+# This indicates that the random forest classifier learnt from the original
+# data is also unfair.
 
 # <a id="reweighing-2015"></a>
 
@@ -734,8 +717,6 @@ print("Corresponding Theil index value: %6.4f" % rf_theil_ind_at_best_bal_acc_or
 # <a id="reweighing-2015-transform"></a>
 
 # #### 3.3.1. Transform data
-
-# In[19]:
 
 
 RW = Reweighing(unprivileged_groups=unprivileged_groups,
@@ -748,7 +729,6 @@ dataset_transf_panel19_train = RW.transform(dataset_orig_panel19_train)
 
 # #### 3.3.2. Metrics for transformed data
 
-# In[20]:
 
 
 metric_transf_panel19_train = BinaryLabelDatasetMetric(dataset_transf_panel19_train, 
@@ -766,7 +746,6 @@ print("Difference in mean outcomes between privileged and unprivileged groups = 
 
 # #### 3.3.3.1. Training LR model after reweighing
 
-# In[21]:
 
 
 #Train model on given dataset
@@ -795,7 +774,6 @@ lr_scale_transf_panel19 = scale
 
 # #### 3.3.3.2. Validating  LR model after reweighing
 
-# In[22]:
 
 
 #validate model on given dataset and find threshold for best balanced accuracy
@@ -806,9 +784,9 @@ thresh_arr = np.linspace(0.01, 0.5, 50)
 scale = lr_scale_transf_panel19
 
 model = lr_transf_panel19                  #model to validate
-dataset = dataset_orig_panel19_validate        #data to validate on
+dataset = dataset_orig_panel19_validate    #data to validate on
 
-X_validate = scale.transform(dataset.features)   #apply the same scale as applied to the training data
+X_validate = scale.transform(dataset.features)   #apply the same scale as # applied to the training data
 y_validate = dataset.labels.ravel()
 y_validate_pred_prob = model.predict_proba(X_validate)
 
@@ -859,7 +837,6 @@ eq_opp_diff_at_best_bal_acc = eq_opp_diff[thresh_arr_best_ind]
 theil_ind_at_best_bal_acc = theil_ind[thresh_arr_best_ind]
 
 
-# In[23]:
 
 
 #Plot balanced accuracy, abs(1-disparate impact)
@@ -879,10 +856,7 @@ ax2.set_ylabel('abs(1-disparate impact)', color='r', fontsize=16, fontweight='bo
 ax2.axvline(np.array(thresh_arr)[thresh_arr_best_ind], 
             color='k', linestyle=':')
 ax2.yaxis.set_tick_params(labelsize=14)
-ax2.grid(True)
-
-
-# In[24]:
+ax2.grid(True
 
 
 #Plot average odds difference
@@ -927,9 +901,6 @@ print("Corresponding Theil index value: %6.4f" % lr_theil_ind_at_best_bal_acc_tr
 
 # #### 3.3.3.3. Testing  LR model after reweighing
 
-# In[26]:
-
-
 #Evaluate performance of a given model with a given threshold on a given dataset
 
 scale = lr_scale_transf_panel19
@@ -938,8 +909,8 @@ dataset = dataset_orig_panel19_test   #apply model to this data
 model = lr_transf_panel19               #this is the model applied
                                    #lr_transf_panel19 is LR model learned from Panel 19
                                    #transformed data
-thresh_arr = lr_thresh_arr_transf_panel19_best  # lr_thresh_arr_transf_panel19_best wass threshold for LR
-                                            # model with highest balanced accuracy
+thresh_arr = lr_thresh_arr_transf_panel19_best  # lr_thresh_arr_transf_panel19_
+# best was threshold for LR model with highest balanced accuracy
 
 
 X_data = scale.transform(dataset.features)
@@ -978,7 +949,6 @@ eq_opp_diff_at_best_bal_acc = classified_metric.equal_opportunity_difference()
 theil_ind_at_best_bal_acc = classified_metric.theil_index()
 
 
-# In[27]:
 
 
 lr_thresh_arr_transf_panel19_best_test = thresh_arr_best
@@ -998,7 +968,9 @@ lr_theil_ind_at_best_bal_acc_transf_panel19_best_test = theil_ind_at_best_bal_ac
 print("Corresponding Theil index value: %6.4f" % lr_theil_ind_at_best_bal_acc_transf_panel19_best_test)
 
 
-# The fairness metrics for the logistic regression model learnt after reweighing are fairly improved, and thus the model is much more fair relative to the logistic regression model learnt from the original data.
+# The fairness metrics for the logistic regression model learnt after reweighing
+# are fairly improved, and thus the model is much more fair relative to the
+# logistic regression model learnt from the original data.
 
 # <a id="rf_transf"></a>
 
@@ -1008,7 +980,6 @@ print("Corresponding Theil index value: %6.4f" % lr_theil_ind_at_best_bal_acc_tr
 
 # #### 3.3.4.1. Training  RF model after reweighing
 
-# In[28]:
 
 
 #Train model on given dataset
@@ -1037,8 +1008,6 @@ rf_scale_transf_panel19 = scale
 
 # #### 3.3.4.2. Validating  RF model after reweighing
 
-# In[29]:
-
 
 #validate model on given dataset and find threshold for best balanced accuracy
 import numpy as np
@@ -1048,9 +1017,9 @@ thresh_arr = np.linspace(0.01, 0.5, 50)
 scale = rf_scale_transf_panel19
 
 model = rf_transf_panel19                  #model to validate
-dataset = dataset_orig_panel19_validate        #data to validate on
+dataset = dataset_orig_panel19_validate    #data to validate on
 
-X_validate = scale.transform(dataset.features)   #apply the same scale as applied to the training data
+X_validate = scale.transform(dataset.features)  #apply the same scale as applied to the training data
 y_validate = dataset.labels.ravel()
 y_validate_pred_prob = model.predict_proba(X_validate)
 
@@ -1101,8 +1070,6 @@ eq_opp_diff_at_best_bal_acc = eq_opp_diff[thresh_arr_best_ind]
 theil_ind_at_best_bal_acc = theil_ind[thresh_arr_best_ind]
 
 
-# In[30]:
-
 
 #Plot balanced accuracy, abs(1-disparate impact)
 
@@ -1124,9 +1091,6 @@ ax2.yaxis.set_tick_params(labelsize=14)
 ax2.grid(True)
 
 
-# In[31]:
-
-
 #Plot average odds difference
 fig, ax1 = plt.subplots(figsize=(10,7))
 ax1.plot(thresh_arr, bal_acc_arr)
@@ -1144,8 +1108,6 @@ ax2.axvline(np.array(thresh_arr)[thresh_arr_best_ind], color='k', linestyle=':')
 ax2.yaxis.set_tick_params(labelsize=14)
 ax2.grid(True)
 
-
-# In[32]:
 
 
 rf_thresh_arr_transf_panel19_best = thresh_arr_best
@@ -1169,7 +1131,6 @@ print("Corresponding Theil index value: %6.4f" % rf_theil_ind_at_best_bal_acc_tr
 
 # #### 3.3.4.3. Testing  RF model after reweighing
 
-# In[33]:
 
 
 #Evaluate performance of a given model with a given threshold on a given dataset

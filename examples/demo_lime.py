@@ -92,7 +92,7 @@ lr_scale_orig = scale
 
 
 
-#Test model on given dataset and find threshold for best balanced accuracy
+# Test model on given dataset and find threshold for best balanced accuracy
 import numpy as np
 from tqdm import tqdm
 thresh_arr = np.linspace(0.01, 0.5, 50)

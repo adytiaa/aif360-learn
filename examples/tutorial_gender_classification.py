@@ -17,11 +17,10 @@ https://susanqq.github.io/UTKFace/
   - Process images and load them as a aiflearn dataset
   - Learn a baseline classifier and obtain fairness metrics
   - Call the `Reweighing` algorithm to obtain obtain instance weights
-  - Learn a new classifier with the instance weights and obtain updated fairness metrics
+  - Learn a new classifier with the instance weights and obtain updated fairness
+    metrics
 """
 # Call the import statements
-
-
 
 
 import glob
@@ -47,7 +46,6 @@ from aiflearn.metrics import ClassificationMetric
 from aiflearn.algorithms.preprocessing.reweighing import Reweighing
 
 
-# In[3]:
 
 
 np.random.seed(99)
@@ -90,14 +88,11 @@ unfavorable_label = 1.0
 # opencv library. The following code creates three key numpy arrays each
 # containing the raw images, the race attributes and the gender labels.
 
-# In[5]:
 
 
 image_dir = '/path/to/UTKFace/'
 img_size = 64
 
-
-# In[ ]:
 
 
 protected_race = []
@@ -127,9 +122,11 @@ age_mat = np.array(feature_age)
 
 
 # # Step 2: Learn a Baseline Classifier
-# Lets build a simple convolutional neural network (CNN) with $3$ convolutional layers and $2$ fully connected layers using the `pytorch` framework. 
+# Lets build a simple convolutional neural network (CNN) with $3$ convolutional
+# layers and $2$ fully connected layers using the `pytorch` framework.
 # ![CNN](images/cnn_arch.png)
-# Each convolutional layer is followed by a maxpool layer. The final layer provides the logits for the binary gender predicition task.
+# Each convolutional layer is followed by a maxpool layer. The final layer
+# provides the logits for the binary gender predicition task.
 
 
 class ThreeLayerCNN(torch.nn.Module):
@@ -162,7 +159,8 @@ class ThreeLayerCNN(torch.nn.Module):
 
 # ## Split the dataset into train and test
 # 
-# Let us rescale the pixels to lie between $-1$ and $1$ and split the complete dataset into train and test sets. 
+# Let us rescale the pixels to lie between $-1$ and $1$ and split the complete
+# dataset into train and test sets.
 # We use $70$-$30$ percentage for train and test, respectively.
 
 # In[9]:
@@ -185,9 +183,8 @@ age_train = age_mat[ids[0:train_size]]
 age_test = age_mat[ids[train_size:]]
 
 
-# Next, we will create the pytorch train and test data loaders after transposing and converting the images and labels. The batch size is set to $64$.
-
-# In[10]:
+# Next, we will create the pytorch train and test data loaders after transposing
+# and converting the images and labels. The batch size is set to $64$.
 
 
 batch_size = 64
@@ -205,7 +202,6 @@ test_loader = torch.utils.data.DataLoader(test, batch_size=batch_size, shuffle=F
 # In the next few steps, we will create and intialize a model with the above
 # described architecture and train it.
 
-# In[11]:
 
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -219,7 +215,6 @@ summary(model, (3,img_size,img_size))
 # We will use the `Adam` otimizer to minimze the standard cross-entropy loss
 # for classification tasks.
 
-# In[12]:
 
 
 num_epochs = 5
@@ -253,7 +248,6 @@ for epoch in range(num_epochs):
 # Let's get the predictions of this trained model on the test and use them to
 # compute various fariness metrics available in the aiflearn toolbox.
 
-# In[13]:
 
 
 # Run model on test set in eval mode.
@@ -276,7 +270,6 @@ y_pred = np.array(y_pred)
 # unprivileged_groups and privileged_groups; and the favorable and unfavorable
 # label to produce an instance of aiflearn's `BinaryLabelDataset`.
 
-# In[14]:
 
 
 def dataset_wrapper(outcome, protected, unprivileged_groups, privileged_groups,
@@ -296,8 +289,6 @@ def dataset_wrapper(outcome, protected, unprivileged_groups, privileged_groups,
                                        unprivileged_protected_attributes=unprivileged_groups)
     return dataset
 
-
-# In[15]:
 
 
 original_traning_dataset = dataset_wrapper(outcome=y_train, protected=p_train, 
@@ -324,7 +315,6 @@ plain_predictions_test_dataset = dataset_wrapper(outcome=y_pred, protected=p_tes
 # (or similar). Later on we will use `BinaryLabelDatasetMetric` which computes
 # based on a single `BinaryLabelDataset`.
 
-# In[16]:
 
 
 classified_metric_nodebiasing_test = ClassificationMetric(original_test_dataset, 
@@ -336,7 +326,6 @@ TNR = classified_metric_nodebiasing_test.true_negative_rate()
 bal_acc_nodebiasing_test = 0.5*(TPR+TNR)
 
 
-# In[17]:
 
 
 # Plain model - without debiasing - classification metrics
@@ -361,7 +350,7 @@ print("Test set: False negative rate difference = %f" % classified_metric_nodebi
 #     [1] F. Kamiran and T. Calders,"Data Preprocessing Techniques for
 #     Classification without Discrimination," Knowledge and Information Systems, 2012.
 
-# In[18]:
+
 
 
 RW = Reweighing(unprivileged_groups=unprivileged_groups,
@@ -369,8 +358,6 @@ RW = Reweighing(unprivileged_groups=unprivileged_groups,
 RW.fit(original_traning_dataset)
 transf_traning_dataset = RW.transform(original_traning_dataset)
 
-
-# In[19]:
 
 
 metric_orig_train = BinaryLabelDatasetMetric(original_traning_dataset, 
@@ -420,8 +407,6 @@ tranf_train = torch.utils.data.TensorDataset(Variable(torch.FloatTensor(X_train.
 tranf_train_loader = torch.utils.data.DataLoader(tranf_train, batch_size=64, shuffle=True)
 
 
-# In[29]:
-
 
 class InstanceWeighetedCrossEntropyLoss(nn.Module):
     """Cross entropy loss with instance weights."""
@@ -433,7 +418,7 @@ class InstanceWeighetedCrossEntropyLoss(nn.Module):
         loss = loss * weights
         return loss.mean()
 
-#Helper functions
+# Helper functions
 def select_target_class(logits, target):
     batch_size, num_classes = logits.size()
     mask = torch.autograd.Variable(torch.arange(0, num_classes)
@@ -449,13 +434,12 @@ def log_sum_exp(x):
     return y
 
 
-# In[30]:
+
 
 
 tranf_model = ThreeLayerCNN().to(device)
 
 
-# In[31]:
 
 
 num_epochs = 5
@@ -486,7 +470,6 @@ for epoch in range(num_epochs):
                     num_epochs, idx+1, num_batches, loss.item()))
 
 
-# In[32]:
 
 
 # Test the model
@@ -505,7 +488,6 @@ y_pred_transf = np.array(y_pred_transf)
 # Let us repeat the same steps as before to convert the predictions into
 # aiflearn dataset and obtain various metrics.
 
-# In[33]:
 
 
 transf_predictions_test_dataset = dataset_wrapper(outcome=y_pred_transf, protected=p_test, 
@@ -623,7 +605,7 @@ plt.show()
 # the results appear to be mixed bag and thus has scope for further improvements
 # by considering age group while learning models.
 
-# In[ ]:
+
 
 
 

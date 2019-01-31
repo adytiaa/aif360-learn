@@ -56,7 +56,6 @@ elif dataset_used == "german":
         dataset_orig = load_preproc_data_german(['age'])
     
 elif dataset_used == "compas":
-#     dataset_orig = CompasDataset()
     if protected_attribute_used == 1:
         privileged_groups = [{'sex': 0}]
         unprivileged_groups = [{'sex': 1}]
@@ -76,8 +75,6 @@ np.random.seed(1)
 
 # #### Split into train, and test
 
-# In[3]:
-
 
 # Get the dataset and split into train and test
 dataset_orig_train, dataset_orig_vt = dataset_orig.split([0.7], shuffle=True)
@@ -90,35 +87,33 @@ dataset_orig_valid, dataset_orig_test = dataset_orig_vt.split([0.5], shuffle=Tru
 
 
 # print out some labels, names, etc.
-display(Markdown("#### Training Dataset shape"))
+# Training Dataset shape
 print(dataset_orig_train.features.shape)
-display(Markdown("#### Favorable and unfavorable labels"))
+# Favorable and unfavorable labels
 print(dataset_orig_train.favorable_label, dataset_orig_train.unfavorable_label)
-display(Markdown("#### Protected attribute names"))
+# Protected attribute names
 print(dataset_orig_train.protected_attribute_names)
-display(Markdown("#### Privileged and unprivileged protected attribute values"))
+# Privileged and unprivileged protected attribute values
 print(dataset_orig_train.privileged_protected_attributes, 
       dataset_orig_train.unprivileged_protected_attributes)
-display(Markdown("#### Dataset feature names"))
+# Dataset feature names
 print(dataset_orig_train.feature_names)
 
 
 # #### Metric for original training data
-
-# In[5]:
 
 
 # Metric for the original dataset
 metric_orig_train = BinaryLabelDatasetMetric(dataset_orig_train, 
                                              unprivileged_groups=unprivileged_groups,
                                              privileged_groups=privileged_groups)
-display(Markdown("#### Original training dataset"))
-print("Difference in mean outcomes between unprivileged and privileged groups = %f" % metric_orig_train.mean_difference())
+# Original training dataset
+print("Difference in mean outcomes between unprivileged and privileged groups = %f"
+      % metric_orig_train.mean_difference())
 
 
 # #### Train with and transform the original training data
 
-# In[6]:
 
 
 RW = Reweighing(unprivileged_groups=unprivileged_groups,
@@ -127,16 +122,13 @@ RW.fit(dataset_orig_train)
 dataset_transf_train = RW.transform(dataset_orig_train)
 
 
-# In[7]:
 
 
 ### Testing 
-assert np.abs(dataset_transf_train.instance_weights.sum()-dataset_orig_train.instance_weights.sum())<1e-6
+assert np.abs(dataset_transf_train.instance_weights.sum()-dataset_orig_train.instance_weights.sum()) < 1e-6
 
 
 # #### Metric with the transformed training data
-
-# In[8]:
 
 
 metric_transf_train = BinaryLabelDatasetMetric(dataset_transf_train, 
@@ -146,16 +138,12 @@ display(Markdown("#### Transformed training dataset"))
 print("Difference in mean outcomes between unprivileged and privileged groups = %f" % metric_transf_train.mean_difference())
 
 
-# In[9]:
-
 
 ### Testing 
 assert np.abs(metric_transf_train.mean_difference()) < 1e-6
 
 
 # ### Train classifier on original data
-
-# In[10]:
 
 
 # Logistic regression classifier and predictions
@@ -178,8 +166,6 @@ dataset_orig_train_pred.labels = y_train_pred
 
 # #### Obtain scores for original validation and test sets
 
-# In[11]:
-
 
 dataset_orig_valid_pred = dataset_orig_valid.copy(deepcopy=True)
 X_valid = scale_orig.transform(dataset_orig_valid_pred.features)
@@ -193,9 +179,6 @@ dataset_orig_test_pred.scores = lmod.predict_proba(X_test)[:,pos_ind].reshape(-1
 
 
 # ### Find the optimal classification threshold from the validation set
-
-# In[12]:
-
 
 num_thresh = 100
 ba_arr = np.zeros(num_thresh)
@@ -221,8 +204,6 @@ print("Optimal classification threshold (no reweighing) = %.4f" % best_class_thr
 
 
 # ### Predictions from the original test set at the optimal classification threshold
-
-# In[13]:
 
 
 display(Markdown("#### Predictions from original testing data"))
@@ -253,8 +234,6 @@ for thresh in tqdm(class_thresh_arr):
 
 # #### Display results for all thresholds
 
-# In[14]:
-
 
 fig, ax1 = plt.subplots(figsize=(10,7))
 ax1.plot(class_thresh_arr, bal_acc_arr_orig)
@@ -272,11 +251,12 @@ ax2.yaxis.set_tick_params(labelsize=14)
 ax2.grid(True)
 
 
-# ```abs(1-disparate impact)``` must be small (close to 0) for classifier predictions to be fair.
+# ```abs(1-disparate impact)``` must be small (close to 0) for classifier
+# predictions to be fair.
 # 
-# However, for a classifier trained with original training data, at the best classification rate, this is quite high. This implies unfairness.
+# However, for a classifier trained with original training data, at the best
+# classification rate, this is quite high. This implies unfairness.
 
-# In[15]:
 
 
 fig, ax1 = plt.subplots(figsize=(10,7))
@@ -316,8 +296,6 @@ y_train_pred = lmod.predict(X_train)
 
 # #### Obtain scores for transformed test set
 
-# In[17]:
-
 
 dataset_transf_test_pred = dataset_orig_test.copy(deepcopy=True)
 X_test = scale_transf.fit_transform(dataset_transf_test_pred.features)
@@ -325,12 +303,11 @@ y_test = dataset_transf_test_pred.labels
 dataset_transf_test_pred.scores = lmod.predict_proba(X_test)[:,pos_ind].reshape(-1,1)
 
 
-# ### Predictions from the transformed test set at the optimal classification threshold
+# ### Predictions from the transformed test set at the optimal classification
+# threshold
 
-# In[18]:
 
-
-display(Markdown("#### Predictions from transformed testing data"))
+# Predictions from transformed testing data
 bal_acc_arr_transf = []
 disp_imp_arr_transf = []
 avg_odds_diff_arr_transf = []
@@ -358,8 +335,6 @@ for thresh in tqdm(class_thresh_arr):
 
 # #### Display results for all thresholds
 
-# In[19]:
-
 
 fig, ax1 = plt.subplots(figsize=(10,7))
 ax1.plot(class_thresh_arr, bal_acc_arr_transf)
@@ -382,7 +357,6 @@ ax2.grid(True)
 # For a classifier trained with reweighted training data, at the best classification rate, this is indeed the case.
 # This implies fairness.
 
-# In[20]:
 
 
 fig, ax1 = plt.subplots(figsize=(10,7))
@@ -401,13 +375,16 @@ ax2.yaxis.set_tick_params(labelsize=14)
 ax2.grid(True)
 
 
-# ```average odds difference = 0.5((FPR_unpriv-FPR_priv)+(TPR_unpriv-TPR_priv))``` must be close to zero for the classifier to be fair.
+# ```average odds difference = 0.5((FPR_unpriv-FPR_priv)+(TPR_unpriv-TPR_priv))```
+# must be close to zero for the classifier to be fair.
 # 
-# For a classifier trained with reweighted training data, at the best classification rate, this is indeed the case.
+# For a classifier trained with reweighted training data, at the best
+# classification rate, this is indeed the case.
 # This implies fairness.
 
 # # Summary of Results
-# We show the optimal classification thresholds, and the fairness and accuracy metrics.
+# We show the optimal classification thresholds, and the fairness and
+# accuracy metrics.
 
 # ### Classification Thresholds
 # 
@@ -439,7 +416,6 @@ ax2.grid(True)
 # |German (Test)|0.6524|0.6460|0.0071|0.0550|0.6524|0.6460|-0.3278|-0.1944|
 # |Compas (Test)|0.6774|0.6562|-0.2439|-0.0946|0.6774|0.6342|-0.1927|0.1042|
 
-# In[ ]:
 
 
 
